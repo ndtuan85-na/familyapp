@@ -1,0 +1,63 @@
+{
+  "notice": "DỮ LIỆU GIẢ CHỈ DÙNG CHO KIỂM THỬ, KHÔNG NẠP VÀO DỮ LIỆU KINH DOANH",
+  "householdId": "DEMO_TEST_ONLY",
+  "products": [
+    {
+      "id": "TOM_SU",
+      "name": "Tôm sú",
+      "category": "Tôm",
+      "baseUnit": "kg",
+      "qtyMilli": 10000,
+      "valueVnd": 1000000
+    },
+    {
+      "id": "CA_THU",
+      "name": "Cá thu tươi",
+      "category": "Cá",
+      "baseUnit": "kg",
+      "qtyMilli": 25000,
+      "valueVnd": 3000000
+    },
+    {
+      "id": "MUC_ONG",
+      "name": "Mực ống",
+      "category": "Mực",
+      "baseUnit": "kg",
+      "qtyMilli": 8000,
+      "valueVnd": 1200000
+    }
+  ],
+  "customers": [
+    {
+      "id": "KH01",
+      "name": "Khách mẫu A",
+      "debtVnd": 1000000
+    },
+    {
+      "id": "KH02",
+      "name": "Khách mẫu B",
+      "debtVnd": 0
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "ConcurrentSale",
+      "stockKg": 10,
+      "deviceA": 7,
+      "deviceB": 5,
+      "expected": "Chỉ một giao dịch được xác nhận"
+    },
+    {
+      "name": "ConcurrentCollection",
+      "debtVnd": 1000000,
+      "deviceA": 700000,
+      "deviceB": 600000,
+      "expected": "Tổng thu không vượt nợ"
+    },
+    {
+      "name": "RetryTimeout",
+      "operationKey": "immutable-operation-key",
+      "expected": "Một chứng từ duy nhất"
+    }
+  ]
+}

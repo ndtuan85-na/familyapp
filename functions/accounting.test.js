@@ -1,0 +1,6 @@
+'use strict';const t=require('node:test'),a=require('node:assert/strict');const A=require('./accounting');
+t('thu nợ theo chứng từ, không vượt dư nợ',()=>{a.deepEqual(A.allocatePayment([{id:'1',dueVnd:100},{id:'2',dueVnd:200}],250),[{id:'1',amountVnd:100},{id:'2',amountVnd:150}]);a.throws(()=>A.allocatePayment([{id:'1',dueVnd:100}],101));});
+t('thu nợ có phân bổ cụ thể',()=>{a.deepEqual(A.allocatePayment([{id:'1',dueVnd:500}],250,[{id:'1',amountVnd:250}]),[{id:'1',amountVnd:250}]);a.throws(()=>A.allocatePayment([{id:'1',dueVnd:200}],250,[{id:'1',amountVnd:250}]));});
+t('hoàn nhiều đợt được phân bổ chiết khấu không nhân đôi',()=>{const original=[{total:1000}];const a1=A.refundDistribution(original,[{total:400}],[],100);const a2=A.refundDistribution(original,[{total:600}],[{total:400}],100);a.equal(a1+a2,900);});
+t('hàng hỏng không nhập lại kho',()=>{const orig={p:{qtyMilli:1000,valueVnd:100000}};const next=A.applySaleReturnStock(orig,[{productId:'p',baseMilli:200,cogsVnd:20000,restock:false}]);a.deepEqual(next,orig);});
+t('hàng trả lại được nhập kho theo giá vốn gốc',()=>{const v=A.applySaleReturnStock({p:{qtyMilli:1000,valueVnd:100000}},[{productId:'p',baseMilli:200,cogsVnd:20000,restock:true}]);a.deepEqual(v.p,{qtyMilli:1200,valueVnd:120000});});

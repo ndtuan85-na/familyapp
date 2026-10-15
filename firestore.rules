@@ -1,0 +1,12 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function authorized(hid) {return request.auth != null && exists(/databases/$(database)/documents/members/$(request.auth.uid)) && get(/databases/$(database)/documents/members/$(request.auth.uid)).data.householdId == hid;}
+  match /members/{uid} {allow read: if request.auth != null && request.auth.uid==uid;allow write: if false;}
+  match /households/{hid}/{collection}/{docId} {
+   allow read: if authorized(hid);
+   // Chỉ Cloud Functions/Admin SDK được ghi, không cho client sửa kho, tiền và sổ chứng từ.
+   allow write: if false;
+  }
+ }
+}

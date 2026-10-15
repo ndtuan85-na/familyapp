@@ -1,0 +1,82 @@
+code,category,name,base_unit,source_type
+CA_THU,Cá,Cá thu,kg,local
+CA_TRICH,Cá,Cá trích,kg,local
+CA_BAC_MA,Cá,Cá bạc má,kg,local
+CA_CHIM,Cá,Cá chim biển,kg,local
+CA_MU,Cá,Cá mú,kg,local
+CA_DUC,Cá,Cá đục,kg,local
+CA_NUC,Cá,Cá nục,kg,market
+CA_HONG,Cá,Cá hồng biển,kg,market
+CA_MOI,Cá,Cá mối,kg,market
+CA_DUI_GA,Cá,Cá đùi gà,kg,local
+CA_LU,Cá,Cá lụ / cá lũ,kg,local
+CA_CHET,Cá,Cá chét,kg,local
+CA_CHAO,Cá,Cá cháo,kg,local
+CA_NGANG,Cá,Cá ngạng,kg,local
+CA_COC,Cá,Cá cốc,kg,local
+CA_LUONG,Cá,Cá lưỡng,kg,local
+CA_VE,Cá,Cá ve,kg,local
+CA_MO,Cá,Cá mòi,kg,extended
+CA_BONG,Cá,Cá bống biển,kg,extended
+CA_CO,Cá,Cá cơm,kg,extended
+MUC_ONG,Mực,Mực ống,kg,extended
+MUC_LA,Mực,Mực lá,kg,extended
+MUC_NANG,Mực,Mực nang,kg,local
+MUC_CAU,Mực,Mực câu,kg,local
+MUC_MOT_NANG,Đồ đã chế biến,Mực một nắng,kg,local
+MUC_KHO,Đồ đã chế biến,Mực khô,kg,local
+TOM_SU,Tôm,Tôm sú,kg,extended
+TOM_THE,Tôm,Tôm thẻ,kg,extended
+TOM_BIEN,Tôm,Tôm biển,kg,local
+TOM_TIT,Tôm,Tôm tít / bề bề,kg,local
+TOM_TIT_BOC,Đồ đã chế biến,Tôm tít bóc nõn,kg,local
+TOM_RUOC,Tôm,Ruốc biển / tép biển,kg,local
+GHE_XANH,Thực phẩm khác,Ghẹ xanh,kg,local
+GHE_DO,Thực phẩm khác,Ghẹ đỏ,kg,extended
+CUA_BIEN,Thực phẩm khác,Cua biển,kg,local
+NGAO,Thực phẩm khác,Ngao / nghêu,kg,local
+SO_HUYET,Thực phẩm khác,Sò huyết,kg,local
+SO_DIEP,Thực phẩm khác,Sò điệp,kg,market
+OC_BIEN,Thực phẩm khác,Ốc biển,kg,local
+HAU,Thực phẩm khác,Hàu biển,kg,extended
+SAM,Thực phẩm khác,Sam biển,con,extended
+CHA_CA,Đồ đã chế biến,Chả cá,kg,market
+CA_THU_NUONG,Đồ đã chế biến,Cá thu nướng,kg,market
+CA_NUC_NUONG,Đồ đã chế biến,Cá nục nướng,kg,market
+CA_MOI_MOT_NANG,Đồ đã chế biến,Cá mối một nắng,kg,market
+NUOC_MAM,Đồ đã chế biến,Nước mắm,lít,local
+MAM_RUOC,Đồ đã chế biến,Mắm ruốc,hũ,local
+CHA_OC,Đồ đã chế biến,Chả ốc,kg,user_requested
+CHA_MUC,Đồ đã chế biến,Chả mực,kg,user_requested
+NEM_HAI_SAN,Đồ đã chế biến,Nem hải sản,kg,user_requested
+CA_NUC_MOT_NANG,Đồ đã chế biến,Cá nục một nắng,kg,user_requested
+CA_NUC_CHUOI,Cá,Cá nục chuối,kg,user_requested
+CA_THU_TUOI,Cá,Cá thu tươi,kg,user_requested
+CA_THU_LUON,Cá,Cá thu lườn,kg,user_requested
+CA_THU_MIENG,Cá,Cá thu miếng,kg,user_requested
+CA_THU_DAU_DUOI,Cá,Cá thu đầu đuôi,kg,user_requested
+TOM_BOC,Tôm,Tôm bóc,kg,user_requested
+TOM_NON,Tôm,Tôm nõn,kg,user_requested
+MOI,Tôm,Moi,kg,user_requested
+CA_MOM_TUOI,Cá,Cá mờm tươi,kg,user_requested
+CA_MOM_KHO,Đồ đã chế biến,Cá mờm khô,kg,user_requested
+CA_MOM_RIM_LAC,Đồ đã chế biến,Cá mờm rim lạc,kg,user_requested
+MUC_SIM_KHO,Đồ đã chế biến,Mực sim khô,kg,user_requested
+MUC_RIM,Đồ đã chế biến,Mực rim,kg,user_requested
+MUC_HAP,Đồ đã chế biến,Mực hấp,kg,user_requested
+MUC_SIM_TUOI,Mực,Mực sim tươi,kg,user_requested
+MUC_SIM_NHAY,Mực,Mực sim nháy,kg,user_requested
+MUC_NHAY_THUONG,Mực,Mực nháy thường,kg,user_requested
+MUC_NHAY_TO,Mực,Mực nháy to,kg,user_requested
+MUC_ONG_THUONG,Mực,Mực ống thường,kg,user_requested
+MUC_ONG_TO,Mực,Mực ống to,kg,user_requested
+HAU_BOC,Thực phẩm khác,Hàu bóc,kg,user_requested
+GHE_XAY,Thực phẩm khác,Ghẹ xay,kg,user_requested
+CHAN_MAI,Thực phẩm khác,Chân mai,kg,user_requested
+CA_THUNG,Cá,Cá thửng,kg,user_requested
+CA_CHI_VANG,Cá,Cá chỉ vàng,kg,user_requested
+CA_BI_KHO,Đồ đã chế biến,Cá bì khô,kg,user_requested
+TOM_LOT,Tôm,Tôm lột,kg,user_requested
+TOM,Tôm,Tôm,kg,user_requested
+CA_NUC_UOP,Đồ đã chế biến,Cá nục ướp,kg,user_requested
+LUON,Thực phẩm khác,Lươn,kg,user_requested
