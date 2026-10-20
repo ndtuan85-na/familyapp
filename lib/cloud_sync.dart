@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'firebase_options.dart';
 import 'models.dart';
 import 'store.dart';
 
@@ -14,7 +16,12 @@ class CloudSync {
 
   Future<String?> initialize() async {
     try {
-      await Firebase.initializeApp(); // cần flutterfire configure
+      if (kIsWeb) {
+        await Firebase.initializeApp(options: DefaultFirebaseOptions.web);
+      } else {
+        // Android keeps using its native Firebase configuration when one is added.
+        await Firebase.initializeApp();
+      }
       ready = true;
       return null;
     } catch (e) {
