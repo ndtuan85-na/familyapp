@@ -261,7 +261,7 @@ class _HomeState extends State<HomeScreen> {
   )]);
   Future<void> _account() async {
     final email = TextEditingController(), password = TextEditingController();
-    const prefs = SharedPreferencesAsync();
+    final prefs = SharedPreferencesAsync();
     email.text = await prefs.getString('familyapp.saved_email') ?? '';
     password.text = await prefs.getString('familyapp.saved_password') ?? '';
     var remember = email.text.isNotEmpty && password.text.isNotEmpty;
