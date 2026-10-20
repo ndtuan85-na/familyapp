@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android and Web
 
 on:
   push:
@@ -9,7 +9,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  build-android:
+    name: Build Android APK
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
@@ -38,6 +39,39 @@ jobs:
         with:
           name: seafood-family-android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  build-web:
+    name: Build Web bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Enable Flutter web platform
+        run: flutter create --platforms=web .
+
+      - name: Install Flutter packages
+        run: flutter pub get
+
+      - name: Prepare SQLite Web assets
+        run: dart run sqflite_common_ffi_web:setup
+
+      - name: Build Web app
+        run: flutter build web --release
+
+      - name: Save Web bundle for download
+        uses: actions/upload-artifact@v4
+        with:
+          name: seafood-family-web
+          path: build/web/
           if-no-files-found: error
           retention-days: 14
 

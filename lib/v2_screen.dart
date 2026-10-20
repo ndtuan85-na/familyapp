@@ -1,13 +1,11 @@
 import 'ledger_screen.dart';
 import 'customer_search.dart';
 import 'price_backup_screen.dart';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 import 'v2_api.dart';
+import 'backup_export.dart';
 
 class BookkeepingScreen extends StatefulWidget {const BookkeepingScreen({super.key});@override State<BookkeepingScreen> createState()=>_BookkeepingState();}
 class _BookkeepingState extends State<BookkeepingScreen>{
@@ -72,8 +70,9 @@ class LineDraft {String? product;final unit=TextEditingController(text:'kg'),qty
 
 class CloudDataScreen extends StatelessWidget {const CloudDataScreen({super.key});
  @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Sổ chứng từ và sao lưu')),body:Column(children:[
-  Padding(padding:const EdgeInsets.all(8),child:Wrap(spacing:8,children:[FilledButton.icon(icon:const Icon(Icons.add),label:const Text('Tạo phiếu nhiều dòng'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const BookkeepingScreen()))),OutlinedButton.icon(icon:const Icon(Icons.receipt_long),label:const Text('Thu nợ / hoàn hàng'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const LedgerScreen()))),OutlinedButton.icon(icon:const Icon(Icons.price_change_outlined),label:const Text('Bảng giá'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const PriceListScreen()))),OutlinedButton.icon(icon:const Icon(Icons.restore_page_outlined),label:const Text('Kiểm tra bản sao lưu'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const BackupInspectionScreen()))),OutlinedButton.icon(icon:const Icon(Icons.backup),label:const Text('Xuất sao lưu JSON'),onPressed:() async {try{final json=await FamilyApi.exportJson();final dir=await getTemporaryDirectory();final f=File('${dir.path}/seafood_backup_${DateTime.now().millisecondsSinceEpoch}.json');await f.writeAsString(json);await SharePlus.instance.share(ShareParams(files:[XFile(f.path)],text:'Sao lưu Hải sản gia đình'));}catch(e){if(context.mounted)ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('$e')));}})])),
+  Padding(padding:const EdgeInsets.all(8),child:Wrap(spacing:8,children:[FilledButton.icon(icon:const Icon(Icons.add),label:const Text('Tạo phiếu nhiều dòng'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const BookkeepingScreen()))),OutlinedButton.icon(icon:const Icon(Icons.receipt_long),label:const Text('Thu nợ / hoàn hàng'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const LedgerScreen()))),OutlinedButton.icon(icon:const Icon(Icons.price_change_outlined),label:const Text('Bảng giá'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const PriceListScreen()))),OutlinedButton.icon(icon:const Icon(Icons.restore_page_outlined),label:const Text('Kiểm tra bản sao lưu'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const BackupInspectionScreen()))),OutlinedButton.icon(icon:const Icon(Icons.backup),label:const Text('Xuất sao lưu JSON'),onPressed:() async {try{final json=await FamilyApi.exportJson();await exportBackupJson(json);}catch(e){if(context.mounted)ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('$e')));}})])),
   const Text('Bản sao lưu chỉ để xuất/kiểm tra. Khôi phục cần xác minh để tránh ghi đè dữ liệu chung.'),
   Expanded(child:StreamBuilder<QuerySnapshot<Map<String,dynamic>>>(stream:FamilyApi.collection('documents').orderBy('createdAt',descending:true).limit(100).snapshots(),builder:(context,s){if(s.hasError)return Text('Lỗi: ${s.error}');if(!s.hasData)return const Center(child:CircularProgressIndicator());return ListView(children:s.data!.docs.map((d){final p=d.data();return ListTile(title:Text('${p['kind']} • ${d.id}'),subtitle:Text('Khách/NCC: ${p['counterpartyId']}'),trailing:Text('${(p['summary'] as Map?)?['grossVnd']??0} đ'));}).toList());}))
  ]));
 }
+

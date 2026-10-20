@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'cloud_sync.dart';
+import 'database_factory.dart';
 import 'screens.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  initializeDatabaseFactoryForPlatform();
   await CloudSync.instance.initialize();
   runApp(const SeafoodApp());
 }
@@ -30,4 +32,5 @@ class SeafoodApp extends StatelessWidget {
     home: const HomeScreen(),
   );
 }
+
 

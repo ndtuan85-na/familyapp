@@ -31,6 +31,12 @@ Không cần cài Flutter hoặc Android Studio trên máy cá nhân. Mỗi lầ
 
 Artifact chứa `app-release.apk`, có thể cài trực tiếp trên thiết bị Android để dùng thử. Bản build hiện được ký bằng debug key của Gradle nên phù hợp cài thử; phát hành lên Google Play cần cấu hình khóa ký phát hành riêng.
 
+## Tạo bản web bằng GitHub Actions
+
+Workflow cũng tạo bản web tĩnh. Trong tab **Actions**, mở lượt chạy mới nhất có dấu xanh và tải artifact **seafood-family-web**. Giải nén ZIP; thư mục bên trong chứa các file web đã build để đưa lên dịch vụ hosting tĩnh.
+
+Bản web lưu dữ liệu offline trong IndexedDB của trình duyệt bằng adapter SQLite web đang ở trạng thái thử nghiệm. Dữ liệu đó riêng theo trình duyệt và địa chỉ web; đồng bộ giữa thiết bị cần cấu hình Firebase. Trình duyệt không hỗ trợ lịch nhắc cục bộ giống ứng dụng Android.
+
 Tên package đề xuất: `com.example.seafood_family_app`; cần đổi sang application ID thực tế trước khi phát hành.
 
 ## Kích hoạt Firebase
@@ -77,4 +83,5 @@ Lưu ý Android cần cấu hình desugaring theo tài liệu `flutter_local_not
 6. Chưa có tích hợp khoá bảo mật, export/restore đầy đủ, phân trang Firestore, rà soát bảo mật và chạy test thiết bị thật.
 
 **Thứ tự hoàn thiện đề xuất**: bộ chứng từ nhiều dòng + đơn vị quy đổi → giao dịch server-side atomic chống âm kho/công nợ → sự kiện hoàn/hủy → lịch giao + cảnh báo trên mọi thiết bị → sao lưu/phân quyền → test phát hành Android/iOS.
+
 

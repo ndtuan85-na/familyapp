@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'models.dart';
@@ -9,7 +10,7 @@ class Store {
   Database? _db;
   Future<Database> get db async {
     if (_db != null) return _db!;
-    final p = join(await getDatabasesPath(), 'seafood_family_v1.db');
+    final p = kIsWeb ? 'seafood_family_v1.db' : join(await getDatabasesPath(), 'seafood_family_v1.db');
     _db = await openDatabase(p, version: 1, onCreate: (db, _) async {
       await db.execute('CREATE TABLE entries(id TEXT PRIMARY KEY, kind TEXT NOT NULL, created_at TEXT NOT NULL, data TEXT NOT NULL)');
       await db.execute('CREATE INDEX idx_entries_kind_date ON entries(kind, created_at)');
@@ -43,3 +44,4 @@ class Store {
     await put(e, enqueue: false);
   }
 }
+
