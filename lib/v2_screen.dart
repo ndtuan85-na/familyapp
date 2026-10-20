@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'v2_api.dart';
 import 'backup_export.dart';
+import 'cloud_sync.dart';
 
 class BookkeepingScreen extends StatefulWidget {const BookkeepingScreen({super.key});@override State<BookkeepingScreen> createState()=>_BookkeepingState();}
 class _BookkeepingState extends State<BookkeepingScreen>{
@@ -28,6 +29,9 @@ class _BookkeepingState extends State<BookkeepingScreen>{
    message('Chưa xác định kết quả do mạng hoặc máy chủ. GIỮ NGUYÊN phiếu và mã giao dịch $operationKey; bấm lại để kiểm tra/gửi cùng mã. Chi tiết: $e');
   }finally{if(mounted)setState(()=>busy=false);}}
  @override Widget build(BuildContext context){
+  if (!CloudSync.instance.ready || CloudSync.instance.householdId == null) {
+   return const CloudAccessRequiredScreen();
+  }
   return Scaffold(appBar:AppBar(title:const Text('Phiếu nhiều mặt hàng')),body:ListView(padding:const EdgeInsets.all(16),children:[
    SegmentedButton<String>(segments:const [ButtonSegment(value:'sale',label:Text('Bán hàng')),ButtonSegment(value:'purchase',label:Text('Nhập hàng'))],selected:{kind},onSelectionChanged:(v)=>setState((){kind=v.first;partyId=null;})),
    const SizedBox(height:12),StreamBuilder<QuerySnapshot<Map<String,dynamic>>>(
@@ -68,8 +72,45 @@ class _BookkeepingState extends State<BookkeepingScreen>{
 }
 class LineDraft {String? product;final unit=TextEditingController(text:'kg'),qty=TextEditingController(text:'1'),factor=TextEditingController(text:'1'),price=TextEditingController(text:'0');void dispose(){unit.dispose();qty.dispose();factor.dispose();price.dispose();}}
 
+class CloudAccessRequiredScreen extends StatelessWidget {
+ const CloudAccessRequiredScreen({super.key});
+
+ @override
+ Widget build(BuildContext context) {
+  final configured = CloudSync.instance.ready;
+  final message = configured
+      ? 'Bạn chưa đăng nhập tài khoản gia đình. Quay lại trang chủ, chọn biểu tượng tài khoản và đăng nhập tài khoản đã được cấp quyền.'
+      : 'Bản web chưa được cấu hình Firebase. Cần kết nối Firebase và cấp tài khoản gia đình trước khi tạo phiếu trực tuyến.';
+  return Scaffold(
+   appBar: AppBar(title: const Text('Sổ bán hàng và nhập hàng')),
+   body: Center(
+    child: Padding(
+     padding: const EdgeInsets.all(24),
+     child: Column(mainAxisSize: MainAxisSize.min, children: [
+      const Icon(Icons.cloud_off_outlined, size: 48),
+      const SizedBox(height: 16),
+      const Text('Chưa thể mở sổ trực tuyến', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
+      const SizedBox(height: 12),
+      Text(message, textAlign: TextAlign.center),
+      const SizedBox(height: 20),
+      FilledButton.icon(
+       onPressed: () => Navigator.pop(context),
+       icon: const Icon(Icons.arrow_back),
+       label: const Text('Quay lại'),
+      ),
+     ]),
+    ),
+   ),
+  );
+ }
+}
+
 class CloudDataScreen extends StatelessWidget {const CloudDataScreen({super.key});
- @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Sổ chứng từ và sao lưu')),body:Column(children:[
+ @override Widget build(BuildContext context) {
+  if (!CloudSync.instance.ready || CloudSync.instance.householdId == null) {
+   return const CloudAccessRequiredScreen();
+  }
+  return Scaffold(appBar:AppBar(title:const Text('Sổ chứng từ và sao lưu')),body:Column(children:[
   Padding(padding:const EdgeInsets.all(8),child:Wrap(spacing:8,children:[FilledButton.icon(icon:const Icon(Icons.add),label:const Text('Tạo phiếu nhiều dòng'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const BookkeepingScreen()))),OutlinedButton.icon(icon:const Icon(Icons.receipt_long),label:const Text('Thu nợ / hoàn hàng'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const LedgerScreen()))),OutlinedButton.icon(icon:const Icon(Icons.price_change_outlined),label:const Text('Bảng giá'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const PriceListScreen()))),OutlinedButton.icon(icon:const Icon(Icons.restore_page_outlined),label:const Text('Kiểm tra bản sao lưu'),onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const BackupInspectionScreen()))),OutlinedButton.icon(icon:const Icon(Icons.backup),label:const Text('Xuất sao lưu JSON'),onPressed:() async {try{final json=await FamilyApi.exportJson();await exportBackupJson(json);}catch(e){if(context.mounted)ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('$e')));}})])),
   const Text('Bản sao lưu chỉ để xuất/kiểm tra. Khôi phục cần xác minh để tránh ghi đè dữ liệu chung.'),
   Expanded(child:StreamBuilder<QuerySnapshot<Map<String,dynamic>>>(stream:FamilyApi.collection('documents').orderBy('createdAt',descending:true).limit(100).snapshots(),builder:(context,s){if(s.hasError)return Text('Lỗi: ${s.error}');if(!s.hasData)return const Center(child:CircularProgressIndicator());return ListView(children:s.data!.docs.map((d){final p=d.data();return ListTile(title:Text('${p['kind']} • ${d.id}'),subtitle:Text('Khách/NCC: ${p['counterpartyId']}'),trailing:Text('${(p['summary'] as Map?)?['grossVnd']??0} đ'));}).toList());}))

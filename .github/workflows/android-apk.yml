@@ -9,6 +9,22 @@ permissions:
   contents: read
 
 jobs:
+  test-ledger:
+    name: Test bookkeeping logic
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run ledger tests
+        working-directory: functions
+        run: node --test
+
   build-android:
     name: Build Android APK
     runs-on: ubuntu-latest
@@ -60,6 +76,9 @@ jobs:
 
       - name: Install Flutter packages
         run: flutter pub get
+
+      - name: Run Flutter tests
+        run: flutter test
 
       - name: Prepare SQLite Web assets
         run: dart run sqflite_common_ffi_web:setup

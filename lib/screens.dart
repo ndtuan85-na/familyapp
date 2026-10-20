@@ -36,7 +36,19 @@ class _HomeState extends State<HomeScreen> {
         catch (e) { if (context.mounted) _message('Lỗi đồng bộ: $e'); }
       }, icon: const Icon(Icons.sync)), IconButton(tooltip: 'Tài khoản', onPressed: _account, icon: const Icon(Icons.account_circle_outlined))]),
       body: pages[tab],
-      floatingActionButton: FloatingActionButton.extended(onPressed: () => tab==0||tab==3 ? Navigator.push(context,MaterialPageRoute(builder: (_)=>const CloudDataScreen())) : showInput(['sale','product','customer','purchase','delivery'][tab]), icon: const Icon(Icons.add), label: Text(['Bán hàng','Mặt hàng','Khách hàng','Nhập hàng','Lịch giao'][tab])),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          if (tab == 0) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const BookkeepingScreen()));
+          } else if (tab == 3) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const CloudDataScreen()));
+          } else {
+            showInput(['sale', 'product', 'customer', 'purchase', 'delivery'][tab]);
+          }
+        },
+        icon: const Icon(Icons.add),
+        label: Text(['Bán hàng', 'Mặt hàng', 'Khách hàng', 'Sổ sách', 'Lịch giao'][tab]),
+      ),
       bottomNavigationBar: NavigationBar(selectedIndex: tab, onDestinationSelected: (n) => setState(() => tab = n), destinations: const [
         NavigationDestination(icon: Icon(Icons.dashboard_outlined), label: 'Tổng quan'),
         NavigationDestination(icon: Icon(Icons.inventory_2_outlined), label: 'Kho'),
