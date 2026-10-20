@@ -4,6 +4,7 @@ import 'brand_logo.dart';
 import 'master_data_screen.dart';
 import 'balance_screen.dart';
 import 'order_management_screen.dart';
+import 'delivery_planner_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -39,7 +40,7 @@ class _HomeState extends State<HomeScreen> {
         builder: (_) => MasterDataScreen(initialTab: initialTab)));
   }
   @override Widget build(BuildContext context) {
-    final pages = [_dashboard(), _products(), _customers(), _transactions(), _delivery()];
+    final pages = [_dashboard(), _products(), _customers(), _transactions(), const DeliveryPlannerScreen()];
     return Scaffold(
       appBar: AppBar(title: Row(children: [const BrandLogo(size: 38), const SizedBox(width: 9), const Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [Text('TÂM AN'), Text('Hải sản gia đình', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xff71817c)))])]), actions: [IconButton(tooltip: 'Đồng bộ', onPressed: () async {
         try { final count = await CloudSync.instance.sync(); if (context.mounted) _message('Đã đồng bộ $count bản ghi.'); }
@@ -57,7 +58,7 @@ class _HomeState extends State<HomeScreen> {
           } else if (tab == 3) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const CloudDataScreen()));
           } else {
-            showInput(['sale', 'product', 'customer', 'purchase', 'delivery'][tab]);
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const DeliveryPlannerScreen()));
           }
         },
         icon: const Icon(Icons.add),
@@ -256,11 +257,6 @@ class _HomeState extends State<HomeScreen> {
       trailing: Text(vnd(e.kind == 'purchase' || e.kind == 'sale' ? lineTotal(money(e.data['unitPrice']), quantity(e.data['qtyMilli'])) : money(e.data['amount']))),
     )
   ]);
-  Widget _delivery() => ListView(children: [for(final e in entries.where((e)=>e.kind=='delivery')) ListTile(
-    leading: const Icon(Icons.notifications_active_outlined),
-    title: Text('${e.data['note']}'),
-    subtitle: Text('Giao: ${e.data['scheduledAt']} • Nhắc trước ${e.data['remindHours']} giờ'),
-  )]);
   Future<void> _account() async {
     final email = TextEditingController(), password = TextEditingController();
     final prefs = SharedPreferencesAsync();

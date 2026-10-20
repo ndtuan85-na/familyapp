@@ -158,7 +158,7 @@ class _MasterDataScreenState extends State<MasterDataScreen> {
   String _callableHelp(Object error, String prefix) {
     final text = error.toString();
     if (text.contains('permission-denied') || text.contains('PERMISSION_DENIED')) {
-      return '$prefix: Firestore đang dùng rules cũ. Cập nhật tệp firestore.rules của bản mới rồi bấm Publish trong Firebase Console.';
+      return '$prefix: tài khoản chưa được cấp quyền vào hộ gia đình trong Firebase. Kiểm tra thành viên hộ và đăng nhập lại.';
     }
     if (text.contains('not-found') || text.contains('NOT_FOUND')) {
       return '$prefix: máy chủ chưa được triển khai các hàm Firebase (upsertMaster/seedCatalog). Cần triển khai Cloud Functions cho dự án seafood-38304.';
