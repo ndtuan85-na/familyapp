@@ -31,7 +31,7 @@ class _HomeState extends State<HomeScreen> {
   @override Widget build(BuildContext context) {
     final pages = [_dashboard(), _products(), _customers(), _transactions(), _delivery()];
     return Scaffold(
-      appBar: AppBar(title: const Text('Hải sản gia đình'), actions: [IconButton(tooltip: 'Đồng bộ', onPressed: () async {
+      appBar: AppBar(title: Row(children: [Container(width: 36, height: 36, decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.set_meal, color: Colors.white, size: 20)), const SizedBox(width: 10), const Text('Hải sản gia đình')]), actions: [IconButton(tooltip: 'Đồng bộ', onPressed: () async {
         try { final count = await CloudSync.instance.sync(); if (context.mounted) _message('Đã đồng bộ $count bản ghi.'); }
         catch (e) { if (context.mounted) _message('Lỗi đồng bộ: $e'); }
       }, icon: const Icon(Icons.sync)), IconButton(tooltip: 'Tài khoản', onPressed: _account, icon: const Icon(Icons.account_circle_outlined))]),
@@ -53,30 +53,38 @@ class _HomeState extends State<HomeScreen> {
     final month = DateTime.now();
     final monthly = entries.where((e) { final d = DateTime.tryParse(e.createdAt)?.toLocal(); return d?.year == month.year && d?.month == month.month; }).toList();
     final ms = Business.stats(monthly);
-    return ListView(padding: const EdgeInsets.all(16), children: [
-      Text('Báo cáo hôm nay', style: Theme.of(context).textTheme.titleLarge),
-      _tile('Doanh thu', vnd(today.revenue), Icons.point_of_sale),
-      _tile('Lợi nhuận tạm tính', vnd(today.profit), Icons.trending_up),
-      _tile('Chi phí', vnd(today.expenses), Icons.payments_outlined),
-      const SizedBox(height: 12),
-      Text('Tổng hợp', style: Theme.of(context).textTheme.titleLarge),
-      _tile('Lợi nhuận tháng này', vnd(ms.profit), Icons.calendar_month),
-      _tile('Khách hàng còn nợ', vnd(all.receivable), Icons.account_balance_wallet_outlined),
-      _tile('Giá trị tồn kho ước tính', vnd(all.stockValue), Icons.inventory_2_outlined),
+    return ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 100), children: [
+      Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xff087f72), Color(0xff16a38d)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(24)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('HÔM NAY · ${DateFormat('dd/MM/yyyy').format(DateTime.now())}', style: const TextStyle(color: Color(0xffd5f4e9), fontSize: 13, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 10), const Text('Chào buổi sáng 👋', style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4), const Text('Cùng xem tình hình kinh doanh hôm nay', style: TextStyle(color: Color(0xffe1f7f0), fontSize: 13)),
+        const SizedBox(height: 18), const Text('DOANH THU HÔM NAY', style: TextStyle(color: Color(0xffc8eee2), letterSpacing: 1, fontSize: 11, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 4), Text(vnd(today.revenue), style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
+      ])),
+      const SizedBox(height: 24),
+      _sectionTitle('Báo cáo hôm nay', 'Theo ngày'),
+      _tile('Lợi nhuận tạm tính', vnd(today.profit), Icons.trending_up, tint: const Color(0xffe3f5ec)),
+      _tile('Chi phí', vnd(today.expenses), Icons.payments_outlined, tint: const Color(0xfffff1df)),
+      const SizedBox(height: 14),
+      _sectionTitle('Tổng hợp', 'Tháng này'),
+      _tile('Lợi nhuận tháng này', vnd(ms.profit), Icons.calendar_month, tint: const Color(0xffe8eefc)),
+      _tile('Khách hàng còn nợ', vnd(all.receivable), Icons.account_balance_wallet_outlined, tint: const Color(0xffffe9e8)),
+      _tile('Giá trị tồn kho ước tính', vnd(all.stockValue), Icons.inventory_2_outlined, tint: const Color(0xffe5f2f4)),
       const SizedBox(height: 8),
       FilledButton.tonal(onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (_)=>const CloudDataScreen())), child: const Text('Mở sổ chứng từ trực tuyến')),
       OutlinedButton(onPressed: () => showInput('expense'), child: const Text('Ghi nhận chi phí')),
       const Text('Lưu ý: Báo cáo MVP, chưa xử lý trả hàng, công nợ nhà cung cấp và giá vốn hồi tố.', style: TextStyle(fontSize: 12)),
     ]);
   }
-  Widget _tile(String title, String value, IconData icon) => Card(child: ListTile(leading: Icon(icon), title: Text(title), trailing: Text(value, style: const TextStyle(fontWeight: FontWeight.bold))));
+  Widget _sectionTitle(String title, String hint) => Padding(padding: const EdgeInsets.only(bottom: 10), child: Row(children: [Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xff183b36))), const Spacer(), Text(hint, style: const TextStyle(fontSize: 12, color: Color(0xff7a8d87), fontWeight: FontWeight.w600))]));
+  Widget _tile(String title, String value, IconData icon, {Color tint = const Color(0xffe3f5ec)}) => Card(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5), child: ListTile(contentPadding: EdgeInsets.zero, leading: Container(width: 44, height: 44, decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(14)), child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 21)), title: Text(title, style: const TextStyle(fontSize: 13, color: Color(0xff71817c))), subtitle: Padding(padding: const EdgeInsets.only(top: 3), child: Text(value, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xff183b36)))))));
   Widget _products() {
     final products = entries.where((e) => e.kind == 'product');
-    return ListView(children: [for (final e in products) ListTile(
-      leading: const Icon(Icons.set_meal), title: Text('${e.data['name']}'),
+    return ListView(padding: const EdgeInsets.all(16), children: [for (final e in products) Card(child: ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5), leading: Container(width: 44, height: 44, decoration: BoxDecoration(color: const Color(0xffe3f5ec), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.set_meal, color: Color(0xff087f72))), title: Text('${e.data['name']}', style: const TextStyle(fontWeight: FontWeight.w700)),
       subtitle: Text('Đơn vị: ${e.data['unit']} • Tồn: ${qtyText(Business.stockMilli(e.id, entries))}'),
-      trailing: Text(vnd(Business.currentUnitCost(e.id, entries))),
-    )]);
+      trailing: Text(vnd(Business.currentUnitCost(e.id, entries)), style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xff087f72))),
+    ))]);
   }
   Widget _customers() {
     final customers = entries.where((e) => e.kind=='customer' && CustomerSearch.matches('${e.data['name']??''}', '${e.data['phone']??''}', customerQuery)).toList();
@@ -205,3 +213,4 @@ class _EntryEditorState extends State<EntryEditor> {
     } catch(e) { if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('$e'))); }
   }
 }
+
