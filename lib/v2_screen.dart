@@ -86,8 +86,14 @@ class _BookkeepingState extends State<BookkeepingScreen> {
           return;
         }
       } catch (_) {}
+      var detail = '$e';
+      if (detail.contains('not-found') || detail.contains('NOT_FOUND')) {
+        detail = 'Cloud Functions của Firebase chưa được triển khai. Cần triển khai backend functions/ lên dự án seafood-38304 trước khi ghi phiếu.';
+      } else if (detail.contains('permission-denied') || detail.contains('PERMISSION_DENIED')) {
+        detail = 'Tài khoản chưa có quyền hộ gia đình hoặc Firestore Rules chưa được Publish đúng bản.';
+      }
       message(
-          'Chưa xác định kết quả do mạng hoặc máy chủ. GIỮ NGUYÊN phiếu và mã giao dịch $operationKey; bấm lại để kiểm tra/gửi cùng mã. Chi tiết: $e');
+          'Chưa ghi được phiếu. Giữ mã giao dịch $operationKey. $detail');
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -167,7 +173,8 @@ class _BookkeepingState extends State<BookkeepingScreen> {
                             value: e.id,
                             child: Text('${e.data()['name'] ?? e.id}')))
                         .toList(),
-                    onChanged: (v) => setState(() => partyId = v));
+                    onChanged: (v) => setState(() => partyId = v),
+                  ),
                   if (docs.isEmpty)
                     Align(
                       alignment: Alignment.centerLeft,
