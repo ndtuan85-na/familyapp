@@ -18,7 +18,7 @@ class _DeliveryPlannerScreenState extends State<DeliveryPlannerScreen> {
   DateTime scheduled = DateTime.now().add(const Duration(hours: 1));
   int remindHours = 1;
   bool busy = false;
-  static const _date = DateFormat('dd/MM/yyyy HH:mm');
+  static final _date = DateFormat('dd/MM/yyyy HH:mm');
 
   @override
   void dispose() { note.dispose(); super.dispose(); }
