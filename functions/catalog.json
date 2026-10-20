@@ -1,0 +1,570 @@
+[
+  {
+    "code": "CA_THU",
+    "category": "Cá",
+    "name": "Cá thu",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_TRICH",
+    "category": "Cá",
+    "name": "Cá trích",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_BAC_MA",
+    "category": "Cá",
+    "name": "Cá bạc má",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_CHIM",
+    "category": "Cá",
+    "name": "Cá chim biển",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_MU",
+    "category": "Cá",
+    "name": "Cá mú",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_DUC",
+    "category": "Cá",
+    "name": "Cá đục",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_NUC",
+    "category": "Cá",
+    "name": "Cá nục",
+    "base_unit": "kg",
+    "source_type": "market"
+  },
+  {
+    "code": "CA_HONG",
+    "category": "Cá",
+    "name": "Cá hồng biển",
+    "base_unit": "kg",
+    "source_type": "market"
+  },
+  {
+    "code": "CA_MOI",
+    "category": "Cá",
+    "name": "Cá mối",
+    "base_unit": "kg",
+    "source_type": "market"
+  },
+  {
+    "code": "CA_DUI_GA",
+    "category": "Cá",
+    "name": "Cá đùi gà",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_LU",
+    "category": "Cá",
+    "name": "Cá lụ / cá lũ",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_CHET",
+    "category": "Cá",
+    "name": "Cá chét",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_CHAO",
+    "category": "Cá",
+    "name": "Cá cháo",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_NGANG",
+    "category": "Cá",
+    "name": "Cá ngạng",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_COC",
+    "category": "Cá",
+    "name": "Cá cốc",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_LUONG",
+    "category": "Cá",
+    "name": "Cá lưỡng",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_VE",
+    "category": "Cá",
+    "name": "Cá ve",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "CA_MO",
+    "category": "Cá",
+    "name": "Cá mòi",
+    "base_unit": "kg",
+    "source_type": "extended"
+  },
+  {
+    "code": "CA_BONG",
+    "category": "Cá",
+    "name": "Cá bống biển",
+    "base_unit": "kg",
+    "source_type": "extended"
+  },
+  {
+    "code": "CA_CO",
+    "category": "Cá",
+    "name": "Cá cơm",
+    "base_unit": "kg",
+    "source_type": "extended"
+  },
+  {
+    "code": "MUC_ONG",
+    "category": "Mực",
+    "name": "Mực ống",
+    "base_unit": "kg",
+    "source_type": "extended"
+  },
+  {
+    "code": "MUC_LA",
+    "category": "Mực",
+    "name": "Mực lá",
+    "base_unit": "kg",
+    "source_type": "extended"
+  },
+  {
+    "code": "MUC_NANG",
+    "category": "Mực",
+    "name": "Mực nang",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "MUC_CAU",
+    "category": "Mực",
+    "name": "Mực câu",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "MUC_MOT_NANG",
+    "category": "Đồ đã chế biến",
+    "name": "Mực một nắng",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "MUC_KHO",
+    "category": "Đồ đã chế biến",
+    "name": "Mực khô",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "TOM_SU",
+    "category": "Tôm",
+    "name": "Tôm sú",
+    "base_unit": "kg",
+    "source_type": "extended"
+  },
+  {
+    "code": "TOM_THE",
+    "category": "Tôm",
+    "name": "Tôm thẻ",
+    "base_unit": "kg",
+    "source_type": "extended"
+  },
+  {
+    "code": "TOM_BIEN",
+    "category": "Tôm",
+    "name": "Tôm biển",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "TOM_TIT",
+    "category": "Tôm",
+    "name": "Tôm tít / bề bề",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "TOM_TIT_BOC",
+    "category": "Đồ đã chế biến",
+    "name": "Tôm tít bóc nõn",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "TOM_RUOC",
+    "category": "Tôm",
+    "name": "Ruốc biển / tép biển",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "GHE_XANH",
+    "category": "Thực phẩm khác",
+    "name": "Ghẹ xanh",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "GHE_DO",
+    "category": "Thực phẩm khác",
+    "name": "Ghẹ đỏ",
+    "base_unit": "kg",
+    "source_type": "extended"
+  },
+  {
+    "code": "CUA_BIEN",
+    "category": "Thực phẩm khác",
+    "name": "Cua biển",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "NGAO",
+    "category": "Thực phẩm khác",
+    "name": "Ngao / nghêu",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "SO_HUYET",
+    "category": "Thực phẩm khác",
+    "name": "Sò huyết",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "SO_DIEP",
+    "category": "Thực phẩm khác",
+    "name": "Sò điệp",
+    "base_unit": "kg",
+    "source_type": "market"
+  },
+  {
+    "code": "OC_BIEN",
+    "category": "Thực phẩm khác",
+    "name": "Ốc biển",
+    "base_unit": "kg",
+    "source_type": "local"
+  },
+  {
+    "code": "HAU",
+    "category": "Thực phẩm khác",
+    "name": "Hàu biển",
+    "base_unit": "kg",
+    "source_type": "extended"
+  },
+  {
+    "code": "SAM",
+    "category": "Thực phẩm khác",
+    "name": "Sam biển",
+    "base_unit": "con",
+    "source_type": "extended"
+  },
+  {
+    "code": "CHA_CA",
+    "category": "Đồ đã chế biến",
+    "name": "Chả cá",
+    "base_unit": "kg",
+    "source_type": "market"
+  },
+  {
+    "code": "CA_THU_NUONG",
+    "category": "Đồ đã chế biến",
+    "name": "Cá thu nướng",
+    "base_unit": "kg",
+    "source_type": "market"
+  },
+  {
+    "code": "CA_NUC_NUONG",
+    "category": "Đồ đã chế biến",
+    "name": "Cá nục nướng",
+    "base_unit": "kg",
+    "source_type": "market"
+  },
+  {
+    "code": "CA_MOI_MOT_NANG",
+    "category": "Đồ đã chế biến",
+    "name": "Cá mối một nắng",
+    "base_unit": "kg",
+    "source_type": "market"
+  },
+  {
+    "code": "NUOC_MAM",
+    "category": "Đồ đã chế biến",
+    "name": "Nước mắm",
+    "base_unit": "lít",
+    "source_type": "local"
+  },
+  {
+    "code": "MAM_RUOC",
+    "category": "Đồ đã chế biến",
+    "name": "Mắm ruốc",
+    "base_unit": "hũ",
+    "source_type": "local"
+  },
+  {
+    "code": "CHA_OC",
+    "category": "Đồ đã chế biến",
+    "name": "Chả ốc",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CHA_MUC",
+    "category": "Đồ đã chế biến",
+    "name": "Chả mực",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "NEM_HAI_SAN",
+    "category": "Đồ đã chế biến",
+    "name": "Nem hải sản",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_NUC_MOT_NANG",
+    "category": "Đồ đã chế biến",
+    "name": "Cá nục một nắng",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_NUC_CHUOI",
+    "category": "Cá",
+    "name": "Cá nục chuối",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_THU_TUOI",
+    "category": "Cá",
+    "name": "Cá thu tươi",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_THU_LUON",
+    "category": "Cá",
+    "name": "Cá thu lườn",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_THU_MIENG",
+    "category": "Cá",
+    "name": "Cá thu miếng",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_THU_DAU_DUOI",
+    "category": "Cá",
+    "name": "Cá thu đầu đuôi",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "TOM_BOC",
+    "category": "Tôm",
+    "name": "Tôm bóc",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "TOM_NON",
+    "category": "Tôm",
+    "name": "Tôm nõn",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "MOI",
+    "category": "Tôm",
+    "name": "Moi",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_MOM_TUOI",
+    "category": "Cá",
+    "name": "Cá mờm tươi",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_MOM_KHO",
+    "category": "Đồ đã chế biến",
+    "name": "Cá mờm khô",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_MOM_RIM_LAC",
+    "category": "Đồ đã chế biến",
+    "name": "Cá mờm rim lạc",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "MUC_SIM_KHO",
+    "category": "Đồ đã chế biến",
+    "name": "Mực sim khô",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "MUC_RIM",
+    "category": "Đồ đã chế biến",
+    "name": "Mực rim",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "MUC_HAP",
+    "category": "Đồ đã chế biến",
+    "name": "Mực hấp",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "MUC_SIM_TUOI",
+    "category": "Mực",
+    "name": "Mực sim tươi",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "MUC_SIM_NHAY",
+    "category": "Mực",
+    "name": "Mực sim nháy",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "MUC_NHAY_THUONG",
+    "category": "Mực",
+    "name": "Mực nháy thường",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "MUC_NHAY_TO",
+    "category": "Mực",
+    "name": "Mực nháy to",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "MUC_ONG_THUONG",
+    "category": "Mực",
+    "name": "Mực ống thường",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "MUC_ONG_TO",
+    "category": "Mực",
+    "name": "Mực ống to",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "HAU_BOC",
+    "category": "Thực phẩm khác",
+    "name": "Hàu bóc",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "GHE_XAY",
+    "category": "Thực phẩm khác",
+    "name": "Ghẹ xay",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CHAN_MAI",
+    "category": "Thực phẩm khác",
+    "name": "Chân mai",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_THUNG",
+    "category": "Cá",
+    "name": "Cá thửng",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_CHI_VANG",
+    "category": "Cá",
+    "name": "Cá chỉ vàng",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_BI_KHO",
+    "category": "Đồ đã chế biến",
+    "name": "Cá bì khô",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "TOM_LOT",
+    "category": "Tôm",
+    "name": "Tôm lột",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "TOM",
+    "category": "Tôm",
+    "name": "Tôm",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "CA_NUC_UOP",
+    "category": "Đồ đã chế biến",
+    "name": "Cá nục ướp",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  },
+  {
+    "code": "LUON",
+    "category": "Thực phẩm khác",
+    "name": "Lươn",
+    "base_unit": "kg",
+    "source_type": "user_requested"
+  }
+]
+

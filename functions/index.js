@@ -3,6 +3,7 @@ const {onCall,HttpsError}=require('firebase-functions/v2/https');
 const admin=require('firebase-admin');
 const D=require('./domain');
 const {createHash}=require('node:crypto');
+const catalog=require('./catalog.json');
 admin.initializeApp();
 const db=admin.firestore();
 const invalid=e=>{if(e instanceof HttpsError) return e; return new HttpsError('failed-precondition',e.message||String(e));};
@@ -28,6 +29,33 @@ exports.upsertMaster=onCall(async(request)=>{
  const ref=parent.collection(kind).doc(key);
  await db.runTransaction(async(tx)=>{const old=await tx.get(ref);if(kind==='products' && old.exists && old.data().baseUnit!==body.baseUnit) throw new Error('Không được thay đổi đơn vị chuẩn của sản phẩm đã tạo');tx.set(ref,body,{merge:true});});
  return {ok:true,id:key};
+ }catch(e){throw invalid(e);}
+});
+
+// Nạp danh mục hải sản Quỳnh Lưu theo kiểu chỉ thêm: không ghi đè tên,
+// giá hoặc cấu hình đơn vị mà hộ gia đình đã chỉnh trước đó.
+exports.seedCatalog=onCall({timeoutSeconds:120},async(request)=>{
+ try{
+  const parent=await root(request.auth?.uid);
+  const ref=parent.collection('products');
+  const existing=await ref.get();
+  const ids=new Set(existing.docs.map(doc=>doc.id));
+  const batch=db.batch();let added=0,skipped=0;
+  for(const row of catalog){
+   const id=D.bounded(row.code,'Mã hải sản',100);
+   if(ids.has(id)){skipped++;continue;}
+   batch.create(ref.doc(id),{
+    name:D.bounded(row.name,'Tên hải sản'),
+    category:D.bounded(row.category,'Nhóm hải sản'),
+    baseUnit:D.bounded(row.base_unit||'kg','Đơn vị',30),
+    sourceType:row.source_type||'local',units:{},retailVnd:0,wholesaleVnd:0,
+    createdAt:admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt:admin.firestore.FieldValue.serverTimestamp(),
+   });
+   added++;
+  }
+  if(added)await batch.commit();
+  return {added,skipped,total:catalog.length};
  }catch(e){throw invalid(e);}
 });
 
@@ -97,3 +125,4 @@ exports.postDocument=onCall({timeoutSeconds:60},async(request)=>{
 });
 
 Object.assign(exports,require('./ledger_ops').createOperations({db,admin,root,invalid}));
+

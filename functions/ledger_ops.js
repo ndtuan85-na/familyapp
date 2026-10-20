@@ -10,7 +10,7 @@ function createOperations({db,admin,root,invalid}){
   const h=await root(req.auth?.uid),b=req.data||{};const key=docId(b.idempotencyKey),kind=b.kind;
   D.assert(['collect','paySupplier'].includes(kind),'Loại thu/chi không hợp lệ');
   const partyId=docId(b.counterpartyId),amount=D.integer(b.amountVnd,'Số tiền',1);
-  D.assert(Array.isArray(b.allocations)&&b.allocations.length>0&&b.allocations.length<=40,'Cần chọn chứng từ công nợ');
+  D.assert(Array.isArray(b.allocations)&&b.allocations.length>0&&b.allocations.length<=100,'Cần chọn chứng từ công nợ (tối đa 100 phiếu mỗi lần)');
   const al=b.allocations.map(x=>({id:docId(x.id),amountVnd:D.integer(x.amountVnd,'Số tiền phân bổ',1)}));
   D.assert(new Set(al.map(x=>x.id)).size===al.length,'Trùng chứng từ');
   const refs=al.map(x=>h.collection('documents').doc(x.id));const newRef=h.collection('documents').doc(key);
@@ -105,3 +105,4 @@ function createOperations({db,admin,root,invalid}){
  return {settleDocument,returnSale,cancelPurchase};
 }
 module.exports={createOperations};
+
