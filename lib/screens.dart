@@ -3,6 +3,7 @@ import 'customer_search.dart';
 import 'brand_logo.dart';
 import 'master_data_screen.dart';
 import 'balance_screen.dart';
+import 'order_management_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -43,7 +44,7 @@ class _HomeState extends State<HomeScreen> {
       appBar: AppBar(title: Row(children: [const BrandLogo(size: 38), const SizedBox(width: 9), const Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [Text('TÂM AN'), Text('Hải sản gia đình', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xff71817c)))])]), actions: [IconButton(tooltip: 'Đồng bộ', onPressed: () async {
         try { final count = await CloudSync.instance.sync(); if (context.mounted) _message('Đã đồng bộ $count bản ghi.'); }
         catch (e) { if (context.mounted) _message('Lỗi đồng bộ: $e'); }
-      }, icon: const Icon(Icons.sync)), IconButton(tooltip: 'Tài khoản', onPressed: _account, icon: const Icon(Icons.account_circle_outlined))]),
+      }, icon: const Icon(Icons.sync)), const InboxButton(), IconButton(tooltip: 'Tài khoản', onPressed: _account, icon: const Icon(Icons.account_circle_outlined))]),
       body: pages[tab],
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -94,6 +95,7 @@ class _HomeState extends State<HomeScreen> {
               OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MasterDataScreen(initialTab: 1))), icon: const Icon(Icons.people_outline), label: const Text('Khách hàng')),
               OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MasterDataScreen(initialTab: 2))), icon: const Icon(Icons.storefront_outlined), label: const Text('Nhà cung cấp')),
               OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BalanceScreen())), icon: const Icon(Icons.account_balance_wallet_outlined), label: const Text('Công nợ & thu/trả')),
+              OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderManagementScreen())), icon: const Icon(Icons.fact_check_outlined), label: const Text('Theo dõi phiếu nhập/xuất')),
               FilledButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BookkeepingScreen())), icon: const Icon(Icons.add_shopping_cart), label: const Text('Lập phiếu nhập/bán')),
             ]),
           ]),

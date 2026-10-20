@@ -21,6 +21,34 @@ class FamilyApi {
     return Map<String, dynamic>.from(r.data as Map);
   }
 
+  static Future<Map<String, dynamic>> createOrder(
+      Map<String, dynamic> payload) async {
+    final r = await FirebaseFunctions.instance
+        .httpsCallable('createOrder')
+        .call(payload);
+    return Map<String, dynamic>.from(r.data as Map);
+  }
+
+  static Future<Map<String, dynamic>> confirmOrder(String orderId) async {
+    final r = await FirebaseFunctions.instance
+        .httpsCallable('confirmOrder')
+        .call({'orderId': orderId});
+    return Map<String, dynamic>.from(r.data as Map);
+  }
+
+  static Future<Map<String, dynamic>> cancelOrder(String orderId) async {
+    final r = await FirebaseFunctions.instance
+        .httpsCallable('cancelOrder')
+        .call({'orderId': orderId});
+    return Map<String, dynamic>.from(r.data as Map);
+  }
+
+  static Future<void> markNotificationRead(String notificationId) async {
+    await FirebaseFunctions.instance
+        .httpsCallable('markNotificationRead')
+        .call({'notificationId': notificationId});
+  }
+
   static Future<Map<String, dynamic>?> operationStatus(String key) async {
     final snap = await collection('documents')
         .doc(key)

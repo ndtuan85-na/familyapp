@@ -9,6 +9,8 @@ import 'backup_export.dart';
 import 'cloud_sync.dart';
 import 'master_data_screen.dart';
 import 'balance_screen.dart';
+import 'order_management_screen.dart';
+import 'package:intl/intl.dart';
 
 class BookkeepingScreen extends StatefulWidget {
   const BookkeepingScreen({super.key});
@@ -20,6 +22,7 @@ class _BookkeepingState extends State<BookkeepingScreen> {
   String kind = 'sale';
   String? partyId;
   bool busy = false;
+  DateTime scheduledAt = DateTime.now().add(const Duration(hours: 1));
   String operationKey = const Uuid().v4();
   final lines = <LineDraft>[LineDraft()];
   final paid = TextEditingController(text: '0'),
@@ -52,36 +55,42 @@ class _BookkeepingState extends State<BookkeepingScreen> {
     setState(() => busy = true);
     try {
       final data = <Map<String, dynamic>>[];
+      if (partyId == null) throw StateError(kind == 'purchase' ? 'Chọn nhà cung cấp.' : 'Chọn khách hàng.');
       for (final l in lines) {
         if (l.product == null) throw StateError('Chọn mặt hàng trên từng dòng');
-        final q =
-            (double.parse(l.qty.text.replaceAll(',', '.')) * 1000).round();
-        final f =
-            (double.parse(l.factor.text.replaceAll(',', '.')) * 1000).round();
+        final qValue = double.tryParse(l.qty.text.replaceAll(',', '.'));
+        final fValue = double.tryParse(l.factor.text.replaceAll(',', '.'));
+        final priceValue = int.tryParse(l.price.text.replaceAll(RegExp(r'[^0-9]'), ''));
+        if (qValue == null || qValue <= 0 || fValue == null || fValue <= 0 || priceValue == null || priceValue < 0) {
+          throw StateError('Kiểm tra số lượng, hệ số quy đổi và đơn giá trên từng dòng.');
+        }
+        final q = (qValue * 1000).round();
+        final f = (fValue * 1000).round();
         data.add({
           'productId': l.product,
           'unit': l.unit.text.trim(),
           'quantityMilli': q,
           'factorMilli': f,
-          'unitPrice': int.parse(l.price.text.replaceAll('.', ''))
+          'unitPrice': priceValue
         });
       }
-      final res = await FamilyApi.post({
+      final res = await FamilyApi.createOrder({
         'idempotencyKey': operationKey,
         'kind': kind,
         'counterpartyId': partyId,
         'lines': data,
         'paidVnd': int.parse(paid.text),
         'feeVnd': int.parse(fee.text),
-        'discountVnd': int.parse(discount.text)
+        'discountVnd': int.parse(discount.text),
+        'scheduledAt': scheduledAt.toIso8601String(),
       });
-      message('Đã xác nhận phiếu: ${res['id']}');
+      message('Đã tạo phiếu chờ ${kind == 'purchase' ? 'nhập' : 'xuất'}: ${res['id']}');
       if (mounted) Navigator.pop(context);
     } catch (e) {
       try {
-        final found = await FamilyApi.operationStatus(operationKey);
-        if (found != null) {
-          message('Máy chủ đã ghi phiếu: $operationKey');
+        final found = await FamilyApi.collection('orders').doc(operationKey).get(const GetOptions(source: Source.server));
+        if (found.exists) {
+          message('Máy chủ đã lưu phiếu chờ: $operationKey');
           if (mounted) Navigator.pop(context);
           return;
         }
@@ -99,6 +108,14 @@ class _BookkeepingState extends State<BookkeepingScreen> {
     }
   }
 
+  Future<void> _pickSchedule() async {
+    final date = await showDatePicker(context: context, initialDate: scheduledAt, firstDate: DateTime.now().subtract(const Duration(days: 1)), lastDate: DateTime.now().add(const Duration(days: 365 * 5)));
+    if (date == null || !mounted) return;
+    final time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(scheduledAt));
+    if (time == null) return;
+    setState(() => scheduledAt = DateTime(date.year, date.month, date.day, time.hour, time.minute));
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!CloudSync.instance.ready || CloudSync.instance.householdId == null) {
@@ -107,6 +124,7 @@ class _BookkeepingState extends State<BookkeepingScreen> {
     return Scaffold(
         appBar: AppBar(title: const Text('Phiếu nhiều mặt hàng')),
         body: ListView(padding: const EdgeInsets.all(16), children: [
+          Align(alignment: Alignment.centerRight, child: TextButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderManagementScreen())), icon: const Icon(Icons.list_alt), label: const Text('Danh sách phiếu'))),
           SegmentedButton<String>(
               segments: const [
                 ButtonSegment(value: 'sale', label: Text('Bán hàng')),
@@ -185,6 +203,9 @@ class _BookkeepingState extends State<BookkeepingScreen> {
                     ),
                 ]);
               }),
+          const SizedBox(height: 8),
+          Card(child: ListTile(leading: const Icon(Icons.event_available_outlined), title: Text('Dự kiến ${kind == 'purchase' ? 'nhập' : 'xuất'} hàng'), subtitle: Text(DateFormat('dd/MM/yyyy · HH:mm').format(scheduledAt)), trailing: const Icon(Icons.edit_calendar_outlined), onTap: _pickSchedule)),
+          const Padding(padding: EdgeInsets.only(bottom: 8), child: Text('Phiếu sẽ chờ xác nhận; tồn kho và công nợ chỉ cập nhật sau khi xác nhận hàng đã thực sự nhập/xuất.')),
           const SizedBox(height: 12),
           StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FamilyApi.collection('products').snapshots(),
@@ -303,10 +324,10 @@ class _BookkeepingState extends State<BookkeepingScreen> {
           Text('Mã giao dịch: $operationKey',
               style: const TextStyle(fontSize: 12)),
           const Text(
-              'Chỉ xác nhận khi trực tuyến. Nếu quá thời gian chờ, giữ màn hình và nhấn xác nhận lại bằng cùng mã.'),
+              'Tạo phiếu trực tuyến. Thành viên khác sẽ nhận thông báo; hệ thống nhắc khi gần đến giờ mà phiếu vẫn chưa được xác nhận.'),
           FilledButton(
               onPressed: busy ? null : save,
-              child: Text(busy ? 'Đang xác nhận...' : 'Xác nhận phiếu')),
+              child: Text(busy ? 'Đang lưu...' : 'Tạo phiếu chờ xác nhận')),
         ]));
   }
 }
@@ -401,6 +422,13 @@ class CloudDataScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (_) => const LedgerScreen()))),
+                OutlinedButton.icon(
+                    icon: const Icon(Icons.fact_check_outlined),
+                    label: const Text('Theo dõi phiếu nhập/xuất'),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const OrderManagementScreen()))),
                 OutlinedButton.icon(
                     icon: const Icon(Icons.price_change_outlined),
                     label: const Text('Bảng giá'),

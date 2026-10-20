@@ -57,7 +57,9 @@ Tên package đề xuất: `com.example.seafood_family_app`; cần đổi sang a
 
 ### Nhập/bán và thu/trả tiền trực tuyến
 
-Các phiếu nhập, bán, thu khách, trả nhà cung cấp dùng Cloud Functions để tính tồn kho và công nợ an toàn theo giao dịch. Mã nguồn Functions nằm trong `functions/`, nhưng cần được triển khai lên dự án Firebase. Việc triển khai Cloud Functions cần dự án Firebase bật gói Blaze và liên kết tài khoản thanh toán; có thể đặt cảnh báo ngân sách trước khi triển khai. Nếu chưa triển khai Functions, danh mục và đối tác vẫn có thể được tạo sau khi publish rules mới, nhưng các phiếu tài chính chưa thể ghi lên sổ trực tuyến.
+Phiếu nhập và xuất hỗ trợ nhiều mặt hàng. Phiếu mới được tạo ở trạng thái **Chờ xác nhận** và có ngày giờ dự kiến; phiếu chưa xác nhận chưa làm thay đổi tồn kho/công nợ. Khi xác nhận, hệ thống mới ghi sổ giao dịch, cập nhật kho và số dư. Có thể lọc theo nhập/xuất và trạng thái, chọn nhiều phiếu rồi xác nhận cùng lúc. Hộ gia đình nhận tin mới trong hộp thư ứng dụng; hệ thống tạo nhắc khi còn 30 phút đến lịch hoặc đã quá giờ.
+
+Các thao tác dùng Cloud Functions để tính tồn kho và công nợ an toàn theo giao dịch. Mã nguồn Functions nằm trong `functions/` và phải được triển khai lên dự án Firebase để phiếu, thông báo và nhắc lịch hoạt động. Scheduled Functions cần Cloud Scheduler; triển khai Cloud Functions/Scheduler yêu cầu dự án Firebase bật gói Blaze và liên kết tài khoản thanh toán. Nếu chưa triển khai Functions, giao diện web vẫn mở được nhưng không thể tạo/xác nhận phiếu trực tuyến hay nhận thông báo liên tài khoản.
 
 **Quan trọng**: Firestore rules cấm UPDATE/DELETE, còn ứng dụng chỉ tạo bản ghi mới UUID — phù hợp giai đoạn đầu. Nếu người dùng muốn sửa/hủy chứng từ, cần thiết kế sự kiện điều chỉnh và nghiệp vụ bù trừ. Không được sửa thẳng chứng từ.
 
@@ -86,11 +88,11 @@ Lưu ý Android cần cấu hình desugaring theo tài liệu `flutter_local_not
 
 ## Giới hạn hiện tại — chưa đạt bản thương mại
 
-1. Một phiếu chỉ có một mặt hàng. Chưa có nhiều đơn vị/quy đổi, nhiều bảng giá và lịch sử giá.
+1. Nhắc lịch chạy phía máy chủ theo chu kỳ 15 phút, thông báo đến hạn hiển thị trong hộp thư khi thành viên mở ứng dụng; chưa gửi push notification khi đóng trình duyệt.
 2. Chưa có thanh toán nhà cung cấp, trả hàng, hủy/điều chỉnh, báo cáo theo khách và theo từng mặt hàng, sao lưu JSON/CSV trong UI.
 3. Chưa làm phân quyền chủ cửa hàng/nhân viên ở giao diện; thành viên cùng hộ cùng quyền truy cập trong bản MVP.
 4. Chưa có logic xử lý giao dịch đồng thời chống bán vượt tồn giữa hai điện thoại, đồng bộ xung đột hay đảm bảo chi phí giá vốn chính xác nếu đồng bộ giao dịch về sai thứ tự. **Không sử dụng số liệu này làm sổ kế toán chính thức khi nhiều người cùng ghi đồng thời.**
-5. Notification tạo trên điện thoại lập lịch, chưa tự chuyển lịch nhắc đến mọi điện thoại thành viên, chưa hỗ trợ chỉnh/hủy lịch.
+5. Chưa có chỉnh sửa phiếu sau khi tạo; phiếu chờ có thể hủy, phiếu đã ghi sổ cần nghiệp vụ trả hàng/điều chỉnh để bù trừ.
 6. Chưa có tích hợp khoá bảo mật, export/restore đầy đủ, phân trang Firestore, rà soát bảo mật và chạy test thiết bị thật.
 
 **Thứ tự hoàn thiện đề xuất**: bộ chứng từ nhiều dòng + đơn vị quy đổi → giao dịch server-side atomic chống âm kho/công nợ → sự kiện hoàn/hủy → lịch giao + cảnh báo trên mọi thiết bị → sao lưu/phân quyền → test phát hành Android/iOS.

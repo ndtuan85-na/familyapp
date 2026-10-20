@@ -60,10 +60,8 @@ exports.seedCatalog=onCall({timeoutSeconds:120},async(request)=>{
 });
 
 // Đây là điểm ghi chứng từ DUY NHẤT. Giao dịch online có tính lặp an toàn.
-exports.postDocument=onCall({timeoutSeconds:60},async(request)=>{
+async function postLedgerDocument(request,parent,body){
  try{
- const parent=await root(request.auth?.uid);
- const body=request.data||{};
  const kind=D.bounded(body.kind,'Loại chứng từ',30);
  D.assert(['purchase','sale'].includes(kind),'Dùng settleDocument để thu/trả tiền theo chứng từ');
  const opId=D.bounded(body.idempotencyKey,'Khóa giao dịch',100);
@@ -122,7 +120,8 @@ exports.postDocument=onCall({timeoutSeconds:60},async(request)=>{
  });
  return result;
  }catch(e){throw invalid(e);}
-});
-
+}
+exports.postDocument=onCall({timeoutSeconds:60},async(request)=>postLedgerDocument(request,await root(request.auth?.uid),request.data||{}));
+Object.assign(exports,require('./order_ops').createOrderOperations({db,admin,root,invalid,postLedgerDocument}));
 Object.assign(exports,require('./ledger_ops').createOperations({db,admin,root,invalid}));
 
