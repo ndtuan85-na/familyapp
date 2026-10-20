@@ -48,6 +48,17 @@ Tên package đề xuất: `com.example.seafood_family_app`; cần đổi sang a
 5. Dùng Firebase Console / Admin SDK (quyền quản trị) tạo document `members/{uid}` với trường `householdId: 'gia-dinh-001'` cho mỗi tài khoản. **Không cho người dùng tự sửa membership.**
 6. Đăng nhập email/mật khẩu ở biểu tượng tài khoản. Đồng bộ các bản ghi trên thiết bị.
 
+### Dùng danh mục trực tuyến
+
+- Sau khi đăng nhập, trang Tổng quan có các nút **Hải sản**, **Khách hàng**, **Nhà cung cấp**, **Công nợ & thu/trả** và **Lập phiếu nhập/bán**.
+- Trong mục **Hải sản**, bấm **Nạp danh mục** để nhập 81 mặt hàng Quỳnh Lưu từ tệp CSV có sẵn; mặt hàng đã tồn tại được giữ nguyên. Có thể tự thêm hải sản, khách hàng và nhà cung cấp.
+- Những bản ghi này nằm dưới `households/{householdId}/products`, `customers` và `suppliers`. `members/{uid}` chỉ cấp quyền cho thành viên và không phải nơi lưu danh mục.
+- Sau khi thay đổi `firestore.rules`, phải sao chép rules mới lên Firebase Console → Firestore Database → Rules và bấm **Publish**. Rules chỉ cho thành viên tạo dữ liệu danh mục; kho, chứng từ và số dư vẫn chỉ được ghi qua máy chủ.
+
+### Nhập/bán và thu/trả tiền trực tuyến
+
+Các phiếu nhập, bán, thu khách, trả nhà cung cấp dùng Cloud Functions để tính tồn kho và công nợ an toàn theo giao dịch. Mã nguồn Functions nằm trong `functions/`, nhưng cần được triển khai lên dự án Firebase. Việc triển khai Cloud Functions cần dự án Firebase bật gói Blaze và liên kết tài khoản thanh toán; có thể đặt cảnh báo ngân sách trước khi triển khai. Nếu chưa triển khai Functions, danh mục và đối tác vẫn có thể được tạo sau khi publish rules mới, nhưng các phiếu tài chính chưa thể ghi lên sổ trực tuyến.
+
 **Quan trọng**: Firestore rules cấm UPDATE/DELETE, còn ứng dụng chỉ tạo bản ghi mới UUID — phù hợp giai đoạn đầu. Nếu người dùng muốn sửa/hủy chứng từ, cần thiết kế sự kiện điều chỉnh và nghiệp vụ bù trừ. Không được sửa thẳng chứng từ.
 
 ## Quyền thông báo Android
@@ -83,5 +94,6 @@ Lưu ý Android cần cấu hình desugaring theo tài liệu `flutter_local_not
 6. Chưa có tích hợp khoá bảo mật, export/restore đầy đủ, phân trang Firestore, rà soát bảo mật và chạy test thiết bị thật.
 
 **Thứ tự hoàn thiện đề xuất**: bộ chứng từ nhiều dòng + đơn vị quy đổi → giao dịch server-side atomic chống âm kho/công nợ → sự kiện hoàn/hủy → lịch giao + cảnh báo trên mọi thiết bị → sao lưu/phân quyền → test phát hành Android/iOS.
+
 
 

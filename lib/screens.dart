@@ -1,6 +1,10 @@
 import 'v2_screen.dart';
 import 'customer_search.dart';
+import 'brand_logo.dart';
+import 'master_data_screen.dart';
+import 'balance_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'cloud_sync.dart';
@@ -28,10 +32,14 @@ class _HomeState extends State<HomeScreen> {
     final ok = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => EntryEditor(type: type, entries: entries)));
     if (ok == true) reload();
   }
+  Future<void> openMasterData(int initialTab) async {
+    await Navigator.push(context, MaterialPageRoute(
+        builder: (_) => MasterDataScreen(initialTab: initialTab)));
+  }
   @override Widget build(BuildContext context) {
     final pages = [_dashboard(), _products(), _customers(), _transactions(), _delivery()];
     return Scaffold(
-      appBar: AppBar(title: Row(children: [Container(width: 36, height: 36, decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.set_meal, color: Colors.white, size: 20)), const SizedBox(width: 10), const Text('Hải sản gia đình')]), actions: [IconButton(tooltip: 'Đồng bộ', onPressed: () async {
+      appBar: AppBar(title: Row(children: [const BrandLogo(size: 38), const SizedBox(width: 9), const Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [Text('TÂM AN'), Text('Hải sản gia đình', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xff71817c)))])]), actions: [IconButton(tooltip: 'Đồng bộ', onPressed: () async {
         try { final count = await CloudSync.instance.sync(); if (context.mounted) _message('Đã đồng bộ $count bản ghi.'); }
         catch (e) { if (context.mounted) _message('Lỗi đồng bộ: $e'); }
       }, icon: const Icon(Icons.sync)), IconButton(tooltip: 'Tài khoản', onPressed: _account, icon: const Icon(Icons.account_circle_outlined))]),
@@ -40,6 +48,10 @@ class _HomeState extends State<HomeScreen> {
         onPressed: () {
           if (tab == 0) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const BookkeepingScreen()));
+          } else if (tab == 1) {
+            openMasterData(0);
+          } else if (tab == 2) {
+            openMasterData(1);
           } else if (tab == 3) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const CloudDataScreen()));
           } else {
@@ -47,7 +59,7 @@ class _HomeState extends State<HomeScreen> {
           }
         },
         icon: const Icon(Icons.add),
-        label: Text(['Bán hàng', 'Mặt hàng', 'Khách hàng', 'Sổ sách', 'Lịch giao'][tab]),
+        label: Text(['Bán hàng', 'Hải sản trực tuyến', 'Khách trực tuyến', 'Sổ sách', 'Lịch giao'][tab]),
       ),
       bottomNavigationBar: NavigationBar(selectedIndex: tab, onDestinationSelected: (n) => setState(() => tab = n), destinations: const [
         NavigationDestination(icon: Icon(Icons.dashboard_outlined), label: 'Tổng quan'),
@@ -66,6 +78,27 @@ class _HomeState extends State<HomeScreen> {
     final monthly = entries.where((e) { final d = DateTime.tryParse(e.createdAt)?.toLocal(); return d?.year == month.year && d?.month == month.month; }).toList();
     final ms = Business.stats(monthly);
     return ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 100), children: [
+      _onlineSummary(),
+      const SizedBox(height: 12),
+      Card(
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('Quản lý trực tuyến', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 4),
+            const Text('Danh mục hải sản, khách hàng, nhà cung cấp, công nợ và phiếu nhập/bán.'),
+            const SizedBox(height: 10),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MasterDataScreen(initialTab: 0))), icon: const Icon(Icons.set_meal_outlined), label: const Text('Hải sản')),
+              OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MasterDataScreen(initialTab: 1))), icon: const Icon(Icons.people_outline), label: const Text('Khách hàng')),
+              OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MasterDataScreen(initialTab: 2))), icon: const Icon(Icons.storefront_outlined), label: const Text('Nhà cung cấp')),
+              OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BalanceScreen())), icon: const Icon(Icons.account_balance_wallet_outlined), label: const Text('Công nợ & thu/trả')),
+              FilledButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BookkeepingScreen())), icon: const Icon(Icons.add_shopping_cart), label: const Text('Lập phiếu nhập/bán')),
+            ]),
+          ]),
+        ),
+      ),
+      const SizedBox(height: 14),
       Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xff087f72), Color(0xff16a38d)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(24)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('HÔM NAY · ${DateFormat('dd/MM/yyyy').format(DateTime.now())}', style: const TextStyle(color: Color(0xffd5f4e9), fontSize: 13, fontWeight: FontWeight.w600)),
         const SizedBox(height: 10), const Text('Chào buổi sáng 👋', style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800)),
@@ -74,7 +107,7 @@ class _HomeState extends State<HomeScreen> {
         const SizedBox(height: 4), Text(vnd(today.revenue), style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
       ])),
       const SizedBox(height: 24),
-      _sectionTitle('Báo cáo hôm nay', 'Theo ngày'),
+      _sectionTitle('Báo cáo offline trên thiết bị này', 'Không đồng bộ'),
       _tile('Lợi nhuận tạm tính', vnd(today.profit), Icons.trending_up, tint: const Color(0xffe3f5ec)),
       _tile('Chi phí', vnd(today.expenses), Icons.payments_outlined, tint: const Color(0xfffff1df)),
       const SizedBox(height: 14),
@@ -85,14 +118,104 @@ class _HomeState extends State<HomeScreen> {
       const SizedBox(height: 8),
       FilledButton.tonal(onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (_)=>const CloudDataScreen())), child: const Text('Mở sổ chứng từ trực tuyến')),
       OutlinedButton(onPressed: () => showInput('expense'), child: const Text('Ghi nhận chi phí')),
-      const Text('Lưu ý: Báo cáo MVP, chưa xử lý trả hàng, công nợ nhà cung cấp và giá vốn hồi tố.', style: TextStyle(fontSize: 12)),
     ]);
   }
+
+  Widget _onlineSummary() {
+    if (!CloudSync.instance.ready || CloudSync.instance.householdId == null) {
+      return Card(child: ListTile(
+        leading: const Icon(Icons.cloud_off_outlined),
+        title: const Text('Chưa đăng nhập sổ trực tuyến'),
+        subtitle: const Text('Đăng nhập bằng biểu tượng tài khoản ở góc trên để xem số liệu chung của gia đình.'),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: _account,
+      ));
+    }
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('households')
+          .doc(CloudSync.instance.householdId)
+          .collection('documents')
+          .snapshots(),
+      builder: (context, docs) {
+        if (docs.hasError) {
+          return Card(child: ListTile(leading: const Icon(Icons.error_outline), title: const Text('Không đọc được sổ trực tuyến'), subtitle: Text('${docs.error}')));
+        }
+        if (!docs.hasData) return const LinearProgressIndicator();
+        final today = DateTime.now();
+        var revenue = 0;
+        var profit = 0;
+        for (final doc in docs.data!.docs) {
+          final row = doc.data();
+          final stamp = row['createdAt'];
+          final date = stamp is Timestamp ? stamp.toDate().toLocal() : null;
+          if (date == null || date.year != today.year || date.month != today.month || date.day != today.day || row['status'] != 'posted') continue;
+          final summary = row['summary'] as Map?;
+          final lines = (row['lines'] as List?) ?? const [];
+          if (row['kind'] == 'sale') {
+            final gross = (summary?['grossVnd'] as num?)?.toInt() ?? lines.fold<int>(0, (sum, line) => sum + (((line as Map)['total'] as num?)?.toInt() ?? 0));
+            final net = gross - ((row['discountVnd'] as num?)?.toInt() ?? 0);
+            final cogs = lines.fold<int>(0, (sum, line) => sum + (((line as Map)['cogsVnd'] as num?)?.toInt() ?? 0));
+            revenue += net;
+            profit += net - cogs;
+          } else if (row['kind'] == 'saleReturn') {
+            revenue -= (row['refundVnd'] as num?)?.toInt() ?? 0;
+            profit -= (row['refundVnd'] as num?)?.toInt() ?? 0;
+            profit += (row['cogsReversedVnd'] as num?)?.toInt() ?? 0;
+          }
+        }
+        return StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('households')
+              .doc(CloudSync.instance.householdId)
+              .collection('balances')
+              .snapshots(),
+          builder: (context, balances) {
+            var customerDebt = 0;
+            var supplierDebt = 0;
+            for (final doc in balances.data?.docs ?? const []) {
+              final amount = (doc.data()['balanceVnd'] as num?)?.toInt() ?? 0;
+              if (doc.id.startsWith('customer_')) customerDebt += amount;
+              if (doc.id.startsWith('supplier_')) supplierDebt += amount;
+            }
+            return Card(
+              color: const Color(0xffe4f4ee),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Text('SỔ TRỰC TUYẾN HÔM NAY', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: .4)),
+                  const SizedBox(height: 8),
+                  Wrap(spacing: 20, runSpacing: 8, children: [
+                    _onlineMetric('Bán thuần', revenue),
+                    _onlineMetric('Lợi nhuận tạm tính', profit),
+                    _onlineMetric('Khách còn nợ', customerDebt),
+                    _onlineMetric('Nợ nhà cung cấp', supplierDebt),
+                  ]),
+                  if (balances.hasError) Padding(padding: const EdgeInsets.only(top: 8), child: Text('Không đọc được công nợ: ${balances.error}')),
+                ]),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _onlineMetric(String title, int amount) => SizedBox(
+        width: 180,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: const TextStyle(fontSize: 12, color: Color(0xff5e7770))),
+          const SizedBox(height: 2),
+          Text(vnd(amount), style: const TextStyle(fontWeight: FontWeight.w800)),
+        ]),
+      );
   Widget _sectionTitle(String title, String hint) => Padding(padding: const EdgeInsets.only(bottom: 10), child: Row(children: [Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xff183b36))), const Spacer(), Text(hint, style: const TextStyle(fontSize: 12, color: Color(0xff7a8d87), fontWeight: FontWeight.w600))]));
   Widget _tile(String title, String value, IconData icon, {Color tint = const Color(0xffe3f5ec)}) => Card(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5), child: ListTile(contentPadding: EdgeInsets.zero, leading: Container(width: 44, height: 44, decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(14)), child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 21)), title: Text(title, style: const TextStyle(fontSize: 13, color: Color(0xff71817c))), subtitle: Padding(padding: const EdgeInsets.only(top: 3), child: Text(value, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xff183b36)))))));
   Widget _products() {
     final products = entries.where((e) => e.kind == 'product');
-    return ListView(padding: const EdgeInsets.all(16), children: [for (final e in products) Card(child: ListTile(
+    return ListView(padding: const EdgeInsets.all(16), children: [
+      Card(child: ListTile(leading: const Icon(Icons.cloud_outlined), title: const Text('Danh mục dùng cho phiếu trực tuyến'), subtitle: const Text('Mở danh mục hải sản của hộ gia đình để nạp danh sách Quỳnh Lưu hoặc thêm mặt hàng.'), trailing: const Icon(Icons.arrow_forward), onTap: () => openMasterData(0))),
+      for (final e in products) Card(child: ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5), leading: Container(width: 44, height: 44, decoration: BoxDecoration(color: const Color(0xffe3f5ec), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.set_meal, color: Color(0xff087f72))), title: Text('${e.data['name']}', style: const TextStyle(fontWeight: FontWeight.w700)),
       subtitle: Text('Đơn vị: ${e.data['unit']} • Tồn: ${qtyText(Business.stockMilli(e.id, entries))}'),
       trailing: Text(vnd(Business.currentUnitCost(e.id, entries)), style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xff087f72))),
@@ -102,6 +225,7 @@ class _HomeState extends State<HomeScreen> {
     final customers = entries.where((e) => e.kind=='customer' && CustomerSearch.matches('${e.data['name']??''}', '${e.data['phone']??''}', customerQuery)).toList();
     customers.sort((a,b) => '${a.data['name']??''}'.compareTo('${b.data['name']??''}'));
     return Column(children: [
+      Padding(padding: const EdgeInsets.fromLTRB(12, 8, 12, 0), child: Card(child: ListTile(leading: const Icon(Icons.cloud_outlined), title: const Text('Khách hàng dùng cho bán hàng trực tuyến'), subtitle: const Text('Thêm khách ở danh sách của hộ gia đình để chọn trong phiếu bán.'), trailing: const Icon(Icons.arrow_forward), onTap: () => openMasterData(1)))),
       Padding(padding: const EdgeInsets.all(12), child: TextField(
         decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'Tìm tên hoặc số điện thoại'),
         onChanged: (value) => setState(() => customerQuery=value),
@@ -144,6 +268,7 @@ class _HomeState extends State<HomeScreen> {
       FilledButton(onPressed: () async {try {await CloudSync.instance.login(email.text.trim(), password.text); if (dialogContext.mounted) Navigator.pop(dialogContext); if (mounted) _message('Đã đăng nhập và đồng bộ.'); } catch(e) { if (mounted) _message('$e'); }}, child: const Text('Đăng nhập')),
     ]));
     email.dispose(); password.dispose();
+    if (mounted) setState(() {});
   }
 }
 
@@ -225,4 +350,5 @@ class _EntryEditorState extends State<EntryEditor> {
     } catch(e) { if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('$e'))); }
   }
 }
+
 

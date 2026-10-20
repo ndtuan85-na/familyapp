@@ -6,14 +6,15 @@ import 'cloud_sync.dart';
 import 'v2_api.dart';
 
 class MasterDataScreen extends StatefulWidget {
-  const MasterDataScreen({super.key});
+  const MasterDataScreen({super.key, this.initialTab = 0});
+  final int initialTab;
 
   @override
   State<MasterDataScreen> createState() => _MasterDataScreenState();
 }
 
 class _MasterDataScreenState extends State<MasterDataScreen> {
-  int tab = 0;
+  late int tab = widget.initialTab.clamp(0, 2).toInt();
   bool busy = false;
   final search = TextEditingController();
 
@@ -92,7 +93,50 @@ class _MasterDataScreenState extends State<MasterDataScreen> {
       await FamilyApi.master(kinds[tab], const Uuid().v4(), result);
       message(isCustomer ? 'Đã thêm khách hàng.' : 'Đã thêm nhà cung cấp.');
     } catch (e) {
-      message('Không lưu được: $e');
+      message(_callableHelp(e, 'Không lưu được'));
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  Future<void> addProduct() async {
+    final name = TextEditingController();
+    final category = TextEditingController(text: 'Hải sản');
+    final unit = TextEditingController(text: 'kg');
+    final result = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Thêm hải sản'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextField(controller: name, autofocus: true, decoration: const InputDecoration(labelText: 'Tên hải sản *')),
+          TextField(controller: category, decoration: const InputDecoration(labelText: 'Nhóm')),
+          TextField(controller: unit, decoration: const InputDecoration(labelText: 'Đơn vị chuẩn')),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Hủy')),
+          FilledButton(onPressed: () => Navigator.pop(dialogContext, {'name': name.text.trim(), 'category': category.text.trim(), 'unit': unit.text.trim()}), child: const Text('Lưu')),
+        ],
+      ),
+    );
+    name.dispose();
+    category.dispose();
+    unit.dispose();
+    if (result == null) return;
+    if (result['name']!.isEmpty) {
+      message('Bạn nhập tên hải sản trước nhé.');
+      return;
+    }
+    setState(() => busy = true);
+    try {
+      await FamilyApi.master('products', const Uuid().v4(), {
+        'name': result['name'],
+        'category': result['category']!.isEmpty ? 'Hải sản' : result['category'],
+        'baseUnit': result['unit']!.isEmpty ? 'kg' : result['unit'],
+        'units': <String, dynamic>{},
+      });
+      message('Đã thêm hải sản.');
+    } catch (e) {
+      message(_callableHelp(e, 'Chưa thêm được hải sản'));
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -105,10 +149,21 @@ class _MasterDataScreenState extends State<MasterDataScreen> {
       message(
           'Đã thêm ${result['added'] ?? 0} mặt hàng Quỳnh Lưu; giữ nguyên ${result['skipped'] ?? 0} mặt hàng đã có.');
     } catch (e) {
-      message('Chưa nạp được danh mục: $e');
+      message(_callableHelp(e, 'Chưa nạp được danh mục'));
     } finally {
       if (mounted) setState(() => busy = false);
     }
+  }
+
+  String _callableHelp(Object error, String prefix) {
+    final text = error.toString();
+    if (text.contains('permission-denied') || text.contains('PERMISSION_DENIED')) {
+      return '$prefix: Firestore đang dùng rules cũ. Cập nhật tệp firestore.rules của bản mới rồi bấm Publish trong Firebase Console.';
+    }
+    if (text.contains('not-found') || text.contains('NOT_FOUND')) {
+      return '$prefix: máy chủ chưa được triển khai các hàm Firebase (upsertMaster/seedCatalog). Cần triển khai Cloud Functions cho dự án seafood-38304.';
+    }
+    return '$prefix: $text';
   }
 
   @override
@@ -122,12 +177,10 @@ class _MasterDataScreenState extends State<MasterDataScreen> {
     final kind = kinds[tab];
     return Scaffold(
       appBar: AppBar(title: const Text('Danh mục & đối tác')),
-      floatingActionButton: tab == 0
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: busy ? null : addParty,
-              icon: const Icon(Icons.person_add_alt_1_outlined),
-              label: Text(tab == 1 ? 'Thêm khách' : 'Thêm nhà cung cấp'),
+      floatingActionButton: FloatingActionButton.extended(
+              onPressed: busy ? null : (tab == 0 ? addProduct : addParty),
+              icon: Icon(tab == 0 ? Icons.set_meal_outlined : Icons.person_add_alt_1_outlined),
+              label: Text(tab == 0 ? 'Thêm hải sản' : tab == 1 ? 'Thêm khách' : 'Thêm nhà cung cấp'),
             ),
       body: Column(children: [
         Padding(

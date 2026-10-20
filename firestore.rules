@@ -2,11 +2,24 @@ rules_version = '2';
 service cloud.firestore {
  match /databases/{database}/documents {
   function authorized(hid) {return request.auth != null && exists(/databases/$(database)/documents/members/$(request.auth.uid)) && get(/databases/$(database)/documents/members/$(request.auth.uid)).data.householdId == hid;}
+  function validMaster(kind) {
+   let data = request.resource.data;
+   return data.keys().hasOnly(['name','baseUnit','category','units','sourceType','retailVnd','wholesaleVnd','phone','address','gender','work'])
+    && data.name is string && data.name.size() > 0 && data.name.size() <= 120
+    && (kind != 'products' || (data.keys().hasAll(['baseUnit','category']) && data.baseUnit is string && data.baseUnit.size() > 0 && data.baseUnit.size() <= 30 && data.category is string && data.category.size() <= 60 && data.units is map && (!('sourceType' in data) || data.sourceType is string) && (!('retailVnd' in data) || data.retailVnd is int) && (!('wholesaleVnd' in data) || data.wholesaleVnd is int)))
+    && (kind == 'products' || ((!('phone' in data) || data.phone is string) && (!('address' in data) || data.address is string) && (!('gender' in data) || data.gender is string) && (!('work' in data) || data.work is string)));
+  }
   match /members/{uid} {allow read: if request.auth != null && request.auth.uid==uid;allow write: if false;}
   match /households/{hid}/{collection}/{docId} {
    allow read: if authorized(hid);
-   // Chỉ Cloud Functions/Admin SDK được ghi, không cho client sửa kho, tiền và sổ chứng từ.
+   // Thành viên có thể thêm dữ liệu danh mục; chỉ máy chủ mới ghi kho, tiền và chứng từ.
+   allow create: if authorized(hid)
+    && collection in ['products','customers','suppliers']
+    && docId.matches('^[A-Za-z0-9_-]{1,100}$')
+    && validMaster(collection);
+   // Không cho client sửa/xóa dữ liệu đã tạo hoặc tự sửa sổ tài chính.
    allow write: if false;
   }
  }
 }
+

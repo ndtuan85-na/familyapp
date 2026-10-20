@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" role="img" aria-labelledby="title desc">
+  <title id="title">Tâm An — Hải sản gia đình</title>
+  <desc id="desc">Thuyền buồm xanh và vàng trên sóng, cùng tên Tâm An và khẩu hiệu An tâm người sử dụng.</desc>
+  <g transform="translate(60 24)">
+    <path d="M38 138c82 28 233 28 343-9-25 58-102 83-192 75-70-6-121-29-151-66Z" fill="#123d78"/>
+    <path d="M174 130 240 12c9 52-5 91-34 132Z" fill="#168ed0"/>
+    <path d="M219 138c34-35 49-75 43-118 51 42 66 83 38 121Z" fill="#ffb629"/>
+    <path d="m240 12-35 128" fill="none" stroke="#f6fbff" stroke-linecap="round" stroke-width="5"/>
+    <path d="M50 193c43-25 74 24 118 0s74 24 118 0 74 24 118 0" fill="none" stroke="#078ca0" stroke-linecap="round" stroke-width="10"/>
+    <path d="M84 219c34-20 60 18 94 0s60 18 94 0 60 18 94 0" fill="none" stroke="#4db8be" stroke-linecap="round" stroke-width="7"/>
+  </g>
+  <text x="360" y="300" text-anchor="middle" fill="#087f52" font-family="Arial, sans-serif" font-size="74" font-weight="700" letter-spacing="5">TÂM AN</text>
+  <path d="M160 321h400" stroke="#d7aa50" stroke-width="2"/>
+  <text x="360" y="365" text-anchor="middle" fill="#63318c" font-family="Arial, sans-serif" font-size="25" font-weight="600">An tâm người sử dụng</text>
+</svg>
+

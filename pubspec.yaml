@@ -31,4 +31,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/quynh_luu_seafood.csv
+    - assets/tam_an_logo.svg
+
 

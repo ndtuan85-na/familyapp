@@ -39,6 +39,14 @@ class _BookkeepingState extends State<BookkeepingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(x)));
   }
 
+  Future<void> openMasterData(int initialTab) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (_) => MasterDataScreen(initialTab: initialTab)),
+    );
+  }
+
   Future<void> save() async {
     if (busy) return;
     setState(() => busy = true);
@@ -111,17 +119,29 @@ class _BookkeepingState extends State<BookkeepingScreen> {
                       kind == 'sale' ? 'customers' : 'suppliers')
                   .snapshots(),
               builder: (ctx, s) {
+                if (s.hasError) {
+                  final partyLabel = kind == 'sale' ? 'khách hàng' : 'nhà cung cấp';
+                  return Text('Không tải được danh sách $partyLabel: ${s.error}');
+                }
                 final docs = s.data?.docs ?? [];
                 final selected = docs.where((d) => d.id == partyId).toList();
                 if (kind == 'sale') {
                   return OutlinedButton.icon(
-                      icon: const Icon(Icons.person_search_outlined),
+                      icon: Icon(docs.isEmpty
+                          ? Icons.person_add_alt_1_outlined
+                          : Icons.person_search_outlined),
                       label: Text(
-                          selected.isEmpty
-                              ? 'Tìm khách theo tên / điện thoại'
+                          docs.isEmpty
+                              ? 'Chưa có khách hàng · Thêm khách'
+                              : selected.isEmpty
+                                  ? 'Tìm khách theo tên / điện thoại'
                               : '${selected.first.data()['name']} · ${selected.first.data()['phone'] ?? ''}',
                           overflow: TextOverflow.ellipsis),
                       onPressed: () async {
+                        if (docs.isEmpty) {
+                          await openMasterData(1);
+                          return;
+                        }
                         final id = await chooseCustomer(context, [
                           for (final d in docs)
                             {
@@ -133,23 +153,62 @@ class _BookkeepingState extends State<BookkeepingScreen> {
                         if (id != null && mounted) setState(() => partyId = id);
                       });
                 }
-                return DropdownButtonFormField<String>(
+                return Column(children: [
+                  DropdownButtonFormField<String>(
                     isExpanded: true,
                     value: selected.isEmpty ? null : partyId,
                     decoration:
-                        const InputDecoration(labelText: 'Nhà cung cấp'),
+                        InputDecoration(
+                            labelText: docs.isEmpty
+                                ? 'Chưa có nhà cung cấp'
+                                : 'Nhà cung cấp'),
                     items: docs
                         .map((e) => DropdownMenuItem(
                             value: e.id,
                             child: Text('${e.data()['name'] ?? e.id}')))
                         .toList(),
                     onChanged: (v) => setState(() => partyId = v));
+                  if (docs.isEmpty)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                          onPressed: () => openMasterData(2),
+                          icon: const Icon(Icons.person_add_alt_1_outlined),
+                          label: const Text('Thêm nhà cung cấp')),
+                    ),
+                ]);
               }),
           const SizedBox(height: 12),
           StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FamilyApi.collection('products').snapshots(),
               builder: (ctx, s) {
                 final docs = s.data?.docs ?? [];
+                if (s.hasError) {
+                  return Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text('Không tải được danh mục hải sản: ${s.error}'),
+                  );
+                }
+                if (s.hasData && docs.isEmpty) {
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          const Icon(Icons.set_meal_outlined, size: 36),
+                          const SizedBox(height: 8),
+                          const Text(
+                              'Hộ gia đình chưa có danh mục hải sản. Nạp danh mục Quỳnh Lưu hoặc thêm mặt hàng trong mục Danh mục & đối tác.'),
+                          const SizedBox(height: 8),
+                          FilledButton.tonalIcon(
+                              onPressed: () => openMasterData(0),
+                              icon: const Icon(Icons.playlist_add),
+                              label: const Text('Mở danh mục hải sản')),
+                        ],
+                      ),
+                    ),
+                  );
+                }
                 return Column(children: [
                   for (int i = 0; i < lines.length; i++)
                     Card(
