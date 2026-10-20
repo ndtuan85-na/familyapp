@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'cloud_sync.dart';
 import 'logic.dart';
 import 'models.dart';
@@ -260,13 +261,38 @@ class _HomeState extends State<HomeScreen> {
   )]);
   Future<void> _account() async {
     final email = TextEditingController(), password = TextEditingController();
-    await showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(title: const Text('Đồng bộ gia đình'), content: Column(mainAxisSize: MainAxisSize.min, children: [
-      Text(CloudSync.instance.ready ? 'Đăng nhập tài khoản đã được quản trị viên cấp quyền.' : 'Chưa cấu hình Firebase. Ứng dụng vẫn dùng offline được.'),
-      TextField(controller: email, decoration: const InputDecoration(labelText: 'Email')),
-      TextField(controller: password, obscureText: true, decoration: const InputDecoration(labelText: 'Mật khẩu')),
-    ]), actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Đóng')),
-      FilledButton(onPressed: () async {try {await CloudSync.instance.login(email.text.trim(), password.text); if (dialogContext.mounted) Navigator.pop(dialogContext); if (mounted) _message('Đã đăng nhập và đồng bộ.'); } catch(e) { if (mounted) _message('$e'); }}, child: const Text('Đăng nhập')),
-    ]));
+    const prefs = SharedPreferencesAsync();
+    email.text = await prefs.getString('familyapp.saved_email') ?? '';
+    password.text = await prefs.getString('familyapp.saved_password') ?? '';
+    var remember = email.text.isNotEmpty && password.text.isNotEmpty;
+    var obscure = true;
+    var signingIn = false;
+    await showDialog<void>(context: context, builder: (dialogContext) => StatefulBuilder(
+      builder: (context, setDialogState) => AlertDialog(title: const Text('Đồng bộ gia đình'), content: Column(mainAxisSize: MainAxisSize.min, children: [
+        Text(CloudSync.instance.ready ? 'Đăng nhập tài khoản đã được quản trị viên cấp quyền.' : 'Chưa cấu hình Firebase. Ứng dụng vẫn dùng offline được.'),
+        TextField(controller: email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email')),
+        TextField(controller: password, obscureText: obscure, decoration: InputDecoration(labelText: 'Mật khẩu', suffixIcon: IconButton(icon: Icon(obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined), onPressed: () => setDialogState(() => obscure = !obscure)))),
+        CheckboxListTile(contentPadding: EdgeInsets.zero, value: remember, onChanged: (value) => setDialogState(() => remember = value ?? false), title: const Text('Ghi nhớ email và mật khẩu'), subtitle: const Text('Chỉ lưu trên thiết bị/trình duyệt này.'), controlAffinity: ListTileControlAffinity.leading),
+      ]), actions: [TextButton(onPressed: signingIn ? null : () => Navigator.pop(dialogContext), child: const Text('Đóng')),
+        FilledButton(onPressed: signingIn ? null : () async {
+          setDialogState(() => signingIn = true);
+          try {
+            await CloudSync.instance.login(email.text.trim(), password.text);
+            if (remember) {
+              await prefs.setString('familyapp.saved_email', email.text.trim());
+              await prefs.setString('familyapp.saved_password', password.text);
+            } else {
+              await prefs.remove('familyapp.saved_email');
+              await prefs.remove('familyapp.saved_password');
+            }
+            if (dialogContext.mounted) Navigator.pop(dialogContext);
+            if (mounted) _message('Đã đăng nhập và đồng bộ.');
+          } catch(e) {
+            setDialogState(() => signingIn = false);
+            if (mounted) _message('$e');
+          }
+        }, child: Text(signingIn ? 'Đang đăng nhập…' : 'Đăng nhập')),
+      ])));
     email.dispose(); password.dispose();
     if (mounted) setState(() {});
   }

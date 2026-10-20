@@ -23,6 +23,14 @@ class CloudSync {
         await Firebase.initializeApp();
       }
       ready = true;
+      final user = await FirebaseAuth.instance.authStateChanges().first;
+      if (user != null) {
+        try {
+          await _attachMember(user.uid);
+        } catch (_) {
+          // Keep startup available; the account button will expose the login issue.
+        }
+      }
       return null;
     } catch (e) {
       ready = false;
@@ -33,7 +41,10 @@ class CloudSync {
   Future<void> login(String email, String password) async {
     if (!ready) throw StateError('Chưa cấu hình Firebase. Xem README.');
     final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-    final uid = credential.user!.uid;
+    await _attachMember(credential.user!.uid);
+  }
+
+  Future<void> _attachMember(String uid) async {
     final member = await FirebaseFirestore.instance.collection('members').doc(uid).get();
     final hid = member.data()?['householdId'];
     if (hid is! String || hid.isEmpty) {
@@ -65,3 +76,4 @@ class CloudSync {
     if (ready) await FirebaseAuth.instance.signOut();
   }
 }
+

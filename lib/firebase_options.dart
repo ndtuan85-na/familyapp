@@ -13,3 +13,4 @@ abstract final class DefaultFirebaseOptions {
     storageBucket: 'seafood-38304.firebasestorage.app',
   );
 }
+
