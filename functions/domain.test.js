@@ -3,3 +3,5 @@ test('quy đổi kg và thùng có khối lượng thực tế',()=>{const l=D.n
 test('không cho phép quy đổi gây sai số',()=>assert.throws(()=>D.normalizeLines([{productId:'tom',unit:'con',quantityMilli:1001,factorMilli:333,unitPrice:2000}])));
 test('tổng nhiều dòng và tồn',()=>{const l=D.normalizeLines([{productId:'a',unit:'kg',factorMilli:1000,quantityMilli:1000,unitPrice:100000},{productId:'a',unit:'kg',factorMilli:1000,quantityMilli:2000,unitPrice:95000}]);assert.equal(l.reduce((s,x)=>s+x.total,0),290000);assert.throws(()=>D.reserveSale({a:{qtyMilli:2500}},l));});
 test('bình quân và bán hết không lưu tồn tiền dư',()=>{const p=D.purchaseValue(2000,100000,3000,240000);assert.deepEqual(p,{qtyMilli:5000,valueVnd:340000});const s=D.saleCost(5000,340000,1500);assert.equal(s.cost,102000);assert.deepEqual(D.saleCost(3500,238000,3500).remaining,{qtyMilli:0,valueVnd:0});});
+
+test('bán hàng phải có giá trị dương và không vượt chiết khấu hoặc tiền thu',()=>{assert.equal(D.saleBalance(1000,100,400),500);assert.throws(()=>D.saleBalance(0,0,0));assert.throws(()=>D.saleBalance(100,101,0));assert.throws(()=>D.saleBalance(100,0,101));});

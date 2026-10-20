@@ -74,8 +74,7 @@ exports.postDocument=onCall({timeoutSeconds:60},async(request)=>{
   if(kind==='sale'){
    D.reserveSale(stock,rawLines);
    for(const l of rawLines){const s=stock[l.productId],calc=D.saleCost(s.qtyMilli,s.valueVnd,l.baseMilli);s.qtyMilli=calc.remaining.qtyMilli;s.valueVnd=calc.remaining.valueVnd;gross+=l.total;cogs+=calc.cost;itemRows.push({...l,cogsVnd:calc.cost});}
-   D.assert(discountVnd<=gross,'Giảm giá vượt tiền hàng');D.assert(paidVnd<=gross-discountVnd,'Đã thu vượt tiền bán');
-   receivableDelta=gross-discountVnd-paidVnd;
+   receivableDelta=D.saleBalance(gross,discountVnd,paidVnd);
   } else if(kind==='purchase'){
    const sum=rawLines.reduce((v,l)=>v+l.total,0);D.assert(sum>0,'Giá trị nhập phải lớn hơn 0');
    for(let i=0;i<rawLines.length;i++){const l=rawLines[i],s=stock[l.productId];const allocated=i===rawLines.length-1?feeVnd-itemRows.reduce((v,x)=>v+x.allocatedFeeVnd,0):Math.floor(feeVnd*l.total/sum);const newState=D.purchaseValue(s.qtyMilli,s.valueVnd,l.baseMilli,l.total+allocated);Object.assign(s,newState);itemRows.push({...l,allocatedFeeVnd:allocated});gross+=l.total;}

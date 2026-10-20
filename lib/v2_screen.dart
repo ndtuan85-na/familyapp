@@ -116,4 +116,4 @@ class CloudDataScreen extends StatelessWidget {const CloudDataScreen({super.key}
   Expanded(child:StreamBuilder<QuerySnapshot<Map<String,dynamic>>>(stream:FamilyApi.collection('documents').orderBy('createdAt',descending:true).limit(100).snapshots(),builder:(context,s){if(s.hasError)return Text('Lỗi: ${s.error}');if(!s.hasData)return const Center(child:CircularProgressIndicator());return ListView(children:s.data!.docs.map((d){final p=d.data();return ListTile(title:Text('${p['kind']} • ${d.id}'),subtitle:Text('Khách/NCC: ${p['counterpartyId']}'),trailing:Text('${(p['summary'] as Map?)?['grossVnd']??0} đ'));}).toList());}))
  ]));
 }
-
+}

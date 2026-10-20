@@ -4,6 +4,11 @@ const assert = (ok, message) => {if (!ok) throw new Error(message);};
 const integer = (value, name, min = 0) => {assert(Number.isSafeInteger(value) && value >= min, `${name} không hợp lệ`); return value;};
 const bounded = (s, name, max=150) => {assert(typeof s === 'string' && s.trim().length > 0 && s.length <= max, `${name} không hợp lệ`); return s.trim();};
 const amount = (price, milli) => {integer(price,'Đơn giá'); integer(milli,'Số lượng',1); const n = Math.round(price*milli/1000); integer(n,'Thành tiền'); return n;};
+function saleBalance(gross, discount, paid) {
+ integer(gross,'Tổng tiền bán',1);integer(discount,'Chiết khấu');integer(paid,'Tiền đã thu');
+ assert(discount<=gross,'Giảm giá vượt tiền hàng');assert(paid<=gross-discount,'Đã thu vượt tiền bán');
+ return gross-discount-paid;
+}
 function normalizeLines(lines) {
  assert(Array.isArray(lines) && lines.length > 0 && lines.length <= 100,'Phiếu cần từ 1–100 dòng');
  return lines.map(l => {
@@ -36,4 +41,4 @@ function saleCost(qty,value,soldQty) {
  const cost=soldQty===qty?value:Math.round(value*soldQty/qty);
  return {cost,remaining:{qtyMilli:qty-soldQty,valueVnd:value-cost}};
 }
-module.exports={assert,integer,bounded,amount,normalizeLines,reserveSale,purchaseValue,saleCost};
+module.exports={assert,integer,bounded,amount,saleBalance,normalizeLines,reserveSale,purchaseValue,saleCost};
